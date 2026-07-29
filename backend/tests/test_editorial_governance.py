@@ -32,7 +32,7 @@ def test_editorial_capabilities():
     response = client.get("/v1/editorial-governance/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-editorial-governance/1.0"
     assert data["automatic_approval"] is False
     assert data["private_editorial_comments_publicly_exposed"] is False

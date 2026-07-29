@@ -34,7 +34,7 @@ def policy() -> ServicePolicyEvidence:
 
 def test_complete_policy_is_ready():
     result = evaluate_service_policy(policy())
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
     assert result.valid is True
     assert result.state == "ready"
     assert result.contractual_commitment_created_automatically is False
@@ -85,7 +85,7 @@ def test_escalation_blocks_automatic_actions():
 
 
 def test_report_integrity():
-    payload = {"version": "7.8.0", "case": "SC-2026-000101", "state": "on_track"}
+    payload = {"version": "7.8.1", "case": "SC-2026-000101", "state": "on_track"}
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     checksum = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     result = verify_service_level_report(ServiceLevelReportEvidence(payload=payload, checksum=checksum))
@@ -96,7 +96,7 @@ def test_capabilities_endpoint():
     response = TestClient(app).get("/v1/help-desk/service-levels/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-help-desk-service-levels/1.0"
     assert data["automatic_assignment"] is False
     assert data["contractual_commitment_created_automatically"] is False

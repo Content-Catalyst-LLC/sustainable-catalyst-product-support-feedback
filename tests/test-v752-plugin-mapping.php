@@ -3,12 +3,12 @@ $root = dirname(__DIR__);
 $plugin = $root . '/wordpress/sustainable-catalyst-feature-suggestions';
 $discovery = file_get_contents($plugin . '/includes/class-scfs-installed-plugin-discovery.php');
 $registry = file_get_contents($plugin . '/includes/class-scfs-canonical-product-registry.php');
-$js = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.0.js');
-$css = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.0.css');
+$js = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.1.js');
+$css = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.1.css');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
-$release = json_decode(file_get_contents($root . '/release-manifest-v7.8.0.json'), true);
+$release = json_decode(file_get_contents($root . '/release-manifest-v7.8.1.json'), true);
 $checks = array(
-    'discovery version' => strpos($discovery, "const VERSION = '7.8.0';") !== false,
+    'discovery version' => strpos($discovery, "const VERSION = '7.8.1';") !== false,
     'ignored option' => strpos($discovery, "const IGNORED_OPTION = 'scfs_installed_plugin_discovery_ignored';") !== false,
     'mapping option' => strpos($discovery, "const MAPPINGS_OPTION = 'scfs_installed_plugin_discovery_mappings';") !== false,
     'mapping precedence' => strpos($discovery, "'administrator_mapping'") !== false,
@@ -45,7 +45,7 @@ $checks = array(
     'responsive mapping layout' => strpos($css, '.scfs-discovery-decision') !== false && strpos($css, '@media (max-width: 960px)') !== false,
     'reduced motion' => strpos($css, 'prefers-reduced-motion') !== false,
     'registry previous version' => strpos($registry, "['previous_version'] = '7.5.2';") !== false,
-    'manifest identity' => ($manifest['version'] ?? '') === '7.8.0' && ($manifest['release_name'] ?? '') === 'GitHub Release Intelligence',
+    'manifest identity' => ($manifest['version'] ?? '') === '7.8.1' && ($manifest['release_name'] ?? '') === 'Private Repository Release Bridge',
     'manifest dropdown' => !empty($manifest['installed_plugin_discovery']['canonical_product_dropdown_mapping']),
     'manifest mapping precedence' => ($manifest['installed_plugin_discovery']['matching_hierarchy'][0] ?? '') === 'administrator_mapping',
     'release validation' => !empty($release['validation']['mapping_source_contract']) && !empty($release['validation']['rest_fragment_refresh']),
@@ -56,4 +56,4 @@ foreach ($checks as $label => $passed) {
         exit(1);
     }
 }
-echo "v7.8.0 canonical plugin mapping workflow contract passed (" . count($checks) . " checks).\n";
+echo "v7.8.1 canonical plugin mapping workflow contract passed (" . count($checks) . " checks).\n";

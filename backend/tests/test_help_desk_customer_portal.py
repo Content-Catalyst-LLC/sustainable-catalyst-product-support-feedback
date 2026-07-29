@@ -23,7 +23,7 @@ def test_access_link_ready_and_hash_only_boundary():
     assert result.state == "ready"
     assert result.raw_access_token_stored is False
     assert result.notification_authority == "contact-engagement"
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
 
 
 def test_access_link_blocks_wrong_authorities_and_raw_token_storage():

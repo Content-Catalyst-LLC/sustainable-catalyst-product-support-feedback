@@ -18,7 +18,7 @@
       "const": "scfs-github-release-intelligence/1.0"
     },
     "version": {
-      "const": "7.8.0"
+      "const": "7.8.1"
     },
     "product_id": {
       "type": "string",

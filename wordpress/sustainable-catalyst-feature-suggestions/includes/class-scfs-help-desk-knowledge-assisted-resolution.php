@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Knowledge_Assisted_Resolution {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-knowledge-resolution/1.0';
     const DB_VERSION = '1.5.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_knowledge_resolution_db_version';

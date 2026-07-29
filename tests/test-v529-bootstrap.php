@@ -3,8 +3,8 @@ $root = dirname(__DIR__);
 $main = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php');
 $class = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/includes/class-scfs-support-discovery.php');
 $checks = array(
-    'plugin header version' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin header version' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'discovery bootstrap' => strpos($main, "class-scfs-support-discovery.php") !== false,
     'discovery instance' => strpos($main, 'SCFS_Support_Discovery::instance();') !== false,
     'discovery class' => strpos($class, 'final class SCFS_Support_Discovery') !== false,

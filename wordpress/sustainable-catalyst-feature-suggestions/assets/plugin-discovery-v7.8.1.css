@@ -1,0 +1,255 @@
+.scfs-plugin-discovery {
+    max-width: 1440px;
+}
+
+.scfs-plugin-discovery section {
+    margin-top: 28px;
+}
+
+.scfs-discovery-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.scfs-discovery-table-wrap {
+    overflow-x: auto;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.scfs-discovery-table-wrap > table {
+    border: 0;
+}
+
+.scfs-discovery-candidates th:nth-child(1) {
+    width: 23%;
+}
+
+.scfs-discovery-candidates th:nth-child(2) {
+    width: 20%;
+}
+
+.scfs-discovery-candidates th:nth-child(3) {
+    width: 24%;
+}
+
+.scfs-discovery-candidates th:nth-child(4) {
+    width: 33%;
+}
+
+.scfs-discovery-chip {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 7px;
+    border: 1px solid #c3c4c7;
+    border-radius: 999px;
+    background: #f6f7f7;
+    font-size: 11px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.scfs-discovery-decision {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.scfs-discovery-decision label {
+    grid-column: 1 / -1;
+}
+
+.scfs-discovery-decision select {
+    width: 100%;
+    max-width: none;
+}
+
+.scfs-discovery-details {
+    margin-top: 8px;
+}
+
+.scfs-discovery-details summary,
+.scfs-discovery-ignored summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.scfs-discovery-details dl {
+    margin: 8px 0 0;
+}
+
+.scfs-discovery-details dl > div {
+    display: grid;
+    grid-template-columns: minmax(110px, .8fr) minmax(140px, 1.2fr);
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.scfs-discovery-details dt {
+    font-weight: 600;
+}
+
+.scfs-discovery-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.scfs-discovery-review-section + .scfs-discovery-review-section {
+    margin-top: 30px;
+}
+
+.scfs-discovery-inline-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 6px 0 0 8px;
+    vertical-align: middle;
+}
+
+.scfs-discovery-ignored {
+    max-width: 1000px;
+    padding: 12px 14px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.scfs-discovery-ignored ul {
+    margin: 12px 0 0;
+}
+
+.scfs-discovery-ignored li {
+    padding: 8px 0;
+    border-top: 1px solid #dcdcde;
+}
+
+.scfs-discovery-zero {
+    margin-top: 22px;
+}
+
+.scfs-discovery-live-notice[hidden] {
+    display: none;
+}
+
+@media (max-width: 960px) {
+    .scfs-discovery-decision {
+        grid-template-columns: 1fr;
+    }
+
+    .scfs-discovery-decision label,
+    .scfs-discovery-decision select,
+    .scfs-discovery-decision button,
+    .scfs-discovery-decision .spinner {
+        grid-column: 1;
+    }
+
+    .scfs-discovery-decision .spinner {
+        justify-self: start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scfs-plugin-discovery *,
+    .scfs-plugin-discovery *::before,
+    .scfs-plugin-discovery *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+.scfs-product-connections .widefat td {
+    vertical-align: top;
+}
+
+.scfs-product-connection-form {
+    margin: 0;
+}
+
+.scfs-product-connection-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.15fr) minmax(300px, 1.35fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.scfs-product-connection-grid select,
+.scfs-product-connection-grid input[type="url"] {
+    width: 100%;
+    max-width: none;
+}
+
+.scfs-product-connection-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+@media (max-width: 1100px) {
+    .scfs-product-connection-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* v7.6.1 repository connection diagnostics */
+.scfs-product-connection-status {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border-left: 4px solid #646970;
+  background: #f6f7f7;
+}
+.scfs-product-connection-status--current {
+  border-left-color: #008a20;
+}
+.scfs-product-connection-status--error {
+  border-left-color: #d63638;
+  background: #fcf0f1;
+}
+
+
+/* v7.7.1 Plugin Discovery Intelligence */
+.scfs-discovery-section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 12px;
+}
+.scfs-discovery-inventory-filters,
+.scfs-discovery-bulk {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.scfs-discovery-inventory-filters input,
+.scfs-discovery-inventory-filters select {
+    min-width: 190px;
+}
+.scfs-discovery-bulk {
+    margin: 0 0 8px;
+}
+.scfs-discovery-confidence,
+.scfs-discovery-version-state {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.scfs-discovery-version-state--current { background: #edfaef; color: #006b1b; }
+.scfs-discovery-version-state--update_available { background: #fcf0f1; color: #8a2424; }
+.scfs-discovery-version-state--ahead { background: #fff8e5; color: #6c4b00; }
+.scfs-plugin-inventory tr[hidden] { display: none; }
+@media (max-width: 782px) {
+    .scfs-discovery-section-heading { align-items: stretch; flex-direction: column; }
+    .scfs-discovery-inventory-filters { align-items: stretch; flex-direction: column; }
+    .scfs-discovery-inventory-filters input,
+    .scfs-discovery-inventory-filters select { width: 100%; min-width: 0; }
+}

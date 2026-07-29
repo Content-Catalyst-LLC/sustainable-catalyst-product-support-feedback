@@ -7,7 +7,7 @@ $js = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggest
 $backend = file_get_contents($root . '/backend/app/support_content_operations.py');
 $backend_main = file_get_contents($root . '/backend/app/main.py');
 $checks = array(
-    'plugin patch version' => strpos($main, 'Version: 7.8.0') !== false,
+    'plugin patch version' => strpos($main, 'Version: 7.8.1') !== false,
     'operations patch version' => strpos($class, "const VERSION = '5.5.0'") !== false,
     'operations schema 1.1' => strpos($class, "const SCHEMA_VERSION = '1.1'") !== false,
     'rollback batch registry' => strpos($class, 'ROLLBACK_OPTION') !== false,

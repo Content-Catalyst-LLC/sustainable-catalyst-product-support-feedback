@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Email_Channel_Operations {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-email-channels/1.0';
     const DB_VERSION = '1.7.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_email_channels_db_version';

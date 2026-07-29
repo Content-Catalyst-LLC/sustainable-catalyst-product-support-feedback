@@ -1,0 +1,34 @@
+{
+  "schema": "scfs-plugin-discovery-intelligence/1.0",
+  "version": "7.8.1",
+  "complete_plugin_inventory": true,
+  "classifications": [
+    "standard",
+    "site-active",
+    "network-active",
+    "inactive",
+    "must-use",
+    "drop-in"
+  ],
+  "confidence_ranked_suggestions": true,
+  "matching_signals": [
+    "administrator_mapping",
+    "exact_plugin_file",
+    "legacy_plugin_file",
+    "sc_product_id_header",
+    "sc_product_header",
+    "plugin_slug",
+    "legacy_plugin_slug",
+    "text_domain",
+    "legacy_text_domain",
+    "plugin_repository_url",
+    "approved_name_alias"
+  ],
+  "bulk_mapping_and_ignore": true,
+  "duplicate_mapping_detection": true,
+  "installed_vs_github_version_comparison": true,
+  "plugin_header_repository_consistency": true,
+  "inventory_search_and_filters": true,
+  "human_confirmation_required": true,
+  "automatic_product_creation": false
+}

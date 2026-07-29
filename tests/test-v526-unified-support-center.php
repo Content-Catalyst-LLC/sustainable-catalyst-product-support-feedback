@@ -5,8 +5,8 @@ $main = file_get_contents($plugin . '/sustainable-catalyst-feature-suggestions.p
 $support = file_get_contents($plugin . '/includes/class-scfs-product-support-platform.php');
 $css = file_get_contents($plugin . '/assets/product-support-platform.css');
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'support platform version' => strpos($support, "const VERSION = '5.4.0';") !== false,
     'embedded browser renderer' => strpos($support, 'private function render_embedded_knowledge_base') !== false,
     'resolve view includes browser' => strpos($support, "case 'resolve':") !== false && strpos($support, '$this->render_embedded_knowledge_base($context[\'product\']);') !== false,

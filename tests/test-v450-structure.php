@@ -10,8 +10,8 @@ $backend = file_get_contents($root . '/backend/app/cross_product_orchestration.p
 $backend_main = file_get_contents($root . '/backend/app/main.py');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'main version constant' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'main version constant' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'orchestration class include' => strpos($main, 'class-scfs-cross-product-orchestration.php') !== false,
     'orchestration class instance' => strpos($main, 'SCFS_Cross_Product_Support_Orchestration::instance();') !== false,
     'orchestration activation' => strpos($main, 'SCFS_Cross_Product_Support_Orchestration::activate();') !== false,
@@ -33,8 +33,8 @@ $checks = array(
     'backend journey builder' => strpos($backend, 'def build_resolution_journey') !== false,
     'backend report verifier' => strpos($backend, 'def verify_orchestration_report') !== false,
     'backend capabilities endpoint' => strpos($backend_main, "/v1/cross-product/capabilities") !== false,
-    'manifest version' => ($manifest['version'] ?? '') === '7.8.0',
-    'manifest release name' => ($manifest['release_name'] ?? '') === 'GitHub Release Intelligence',
+    'manifest version' => ($manifest['version'] ?? '') === '7.8.1',
+    'manifest release name' => ($manifest['release_name'] ?? '') === 'Private Repository Release Bridge',
     'incident post type in manifest' => in_array('sc_platform_incident', $manifest['wordpress_post_types'] ?? array(), true),
     'orchestration shortcode in manifest' => in_array('[scfs_cross_product_support]', $manifest['shortcodes'] ?? array(), true),
     'orchestration documentation' => file_exists($root . '/docs/cross-product-support-orchestration.md'),

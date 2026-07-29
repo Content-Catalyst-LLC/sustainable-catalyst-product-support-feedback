@@ -11,4 +11,4 @@ $discovery = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-
 foreach (array("array('', 'unverified', 'current', 'inactive', 'update_available')", "in_array(\$found['version_state'], array('valid', 'development'), true)") as $needle) {
     if (strpos($discovery, $needle) === false) { fwrite(STDERR, "FAIL override preservation: {$needle}\n"); exit(1); }
 }
-echo "v7.8.0 registry and override compatibility contract passed.\n";
+echo "v7.8.1 registry and override compatibility contract passed.\n";

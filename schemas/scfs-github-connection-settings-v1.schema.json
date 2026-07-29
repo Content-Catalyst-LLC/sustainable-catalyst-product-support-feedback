@@ -6,17 +6,65 @@
   "required": [
     "schema",
     "version",
-    "token_source",
-    "token_configured",
+    "authentication_source",
+    "authentication_configured",
+    "github_app_configured",
     "webhook_secret_source",
     "webhook_secret_configured"
   ],
   "properties": {
     "schema": {
-      "const": "scfs-github-connection-settings/1.0"
+      "const": "scfs-github-connection-settings/1.1"
     },
     "version": {
-      "const": "7.8.0"
+      "const": "7.8.1"
+    },
+    "authentication_source": {
+      "enum": [
+        "none",
+        "wp_config",
+        "environment",
+        "wordpress",
+        "github_app_wp_config",
+        "github_app_environment",
+        "github_app_wordpress"
+      ]
+    },
+    "authentication_configured": {
+      "type": "boolean"
+    },
+    "github_app_configured": {
+      "type": "boolean"
+    },
+    "github_app_id_source": {
+      "enum": [
+        "none",
+        "wp_config",
+        "environment",
+        "wordpress"
+      ]
+    },
+    "github_app_installation_id_source": {
+      "enum": [
+        "none",
+        "wp_config",
+        "environment",
+        "wordpress"
+      ]
+    },
+    "github_app_private_key_source": {
+      "enum": [
+        "none",
+        "wp_config",
+        "environment",
+        "wordpress"
+      ]
+    },
+    "installation_token_cached": {
+      "type": "boolean"
+    },
+    "installation_token_expires_at": {
+      "type": "string"
     },
     "token_source": {
       "enum": [

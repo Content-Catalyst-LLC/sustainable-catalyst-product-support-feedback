@@ -14,7 +14,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-help-desk-knowledge-resolution/1.0"
 
 STOP = {

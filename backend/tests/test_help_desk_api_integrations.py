@@ -86,7 +86,7 @@ def test_privacy_evaluator_removes_sensitive_fields():
 
 
 def test_report_integrity():
-    payload = {"records": [{"integration": "github", "state": "healthy"}], "version": "7.8.0"}
+    payload = {"records": [{"integration": "github", "state": "healthy"}], "version": "7.8.1"}
     digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
     result = verify_integration_report(IntegrationReportEvidence(payload=payload, sha256=digest))
     assert result.valid is True
@@ -97,7 +97,7 @@ def test_capabilities_endpoint():
     response = TestClient(app).get('/v1/help-desk/integrations/capabilities')
     assert response.status_code == 200
     body = response.json()
-    assert body['version'] == '7.8.0'
+    assert body['version'] == '7.8.1'
     assert body['schema'] == 'scfs-help-desk-api-integrations/1.0'
     assert body['signed_outbound_webhooks'] is True
     assert body['public_inbound_webhook'] is False

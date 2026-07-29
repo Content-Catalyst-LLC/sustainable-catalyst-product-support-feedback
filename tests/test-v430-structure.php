@@ -7,8 +7,8 @@ $backend = file_get_contents($root . '/backend/app/repository_release_sync.py');
 $backend_main = file_get_contents($root . '/backend/app/main.py');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'main version constant' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'main version constant' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'repository synchronization include' => strpos($main, 'class-scfs-repository-release-sync.php') !== false,
     'repository synchronization instance' => strpos($main, 'SCFS_Repository_Release_Synchronization::instance();') !== false,
     'repository synchronization activation' => strpos($main, 'SCFS_Repository_Release_Synchronization::activate();') !== false,
@@ -33,7 +33,7 @@ $checks = array(
     'backend release planner' => strpos($backend, 'def plan_release_sync') !== false,
     'backend link summary' => strpos($backend, 'def summarize_link_health') !== false,
     'backend capabilities endpoint' => strpos($backend_main, "/v1/repository-sync/capabilities") !== false,
-    'manifest version' => ($manifest['version'] ?? '') === '7.8.0',
+    'manifest version' => ($manifest['version'] ?? '') === '7.8.1',
     'repository sync documentation' => file_exists($root . '/docs/repository-release-synchronization.md'),
     'sync decision example' => file_exists($root . '/examples/repository-sync-decision.json'),
     'drift example' => file_exists($root . '/examples/repository-drift-report.json'),

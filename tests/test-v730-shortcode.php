@@ -33,4 +33,4 @@ $checks = array(
 foreach ($checks as $label => $ok) {
     if (!$ok) { fwrite(STDERR, "FAIL: {$label}\n"); exit(1); }
 }
-echo "v7.8.0 release board shortcode contract passed.\n";
+echo "v7.8.1 release board shortcode contract passed.\n";

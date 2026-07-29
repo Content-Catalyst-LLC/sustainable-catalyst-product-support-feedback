@@ -70,4 +70,4 @@ $checks = array(
 foreach ($checks as $label => $passed) {
     if (!$passed) { fwrite(STDERR, "FAIL: {$label}\n"); exit(1); }
 }
-echo 'v7.8.0 GitHub Release Intelligence runtime contract passed (' . count($checks) . " checks).\n";
+echo 'v7.8.1 Private Repository Release Bridge runtime contract passed (' . count($checks) . " checks).\n";

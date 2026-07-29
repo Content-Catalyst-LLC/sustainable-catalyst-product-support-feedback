@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Customer_Portal {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-customer-portal/1.0';
     const DB_VERSION = '1.2.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_portal_db_version';

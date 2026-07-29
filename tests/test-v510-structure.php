@@ -9,8 +9,8 @@ $feedback = file_get_contents($plugin . '/includes/class-scfs-documentation-inte
 $editorial = file_get_contents($plugin . '/includes/class-scfs-editorial-governance.php');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'main version constant' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'main version constant' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'integrated class included' => strpos($main, 'class-scfs-integrated-knowledge-base.php') !== false,
     'integrated class instantiated' => strpos($main, 'SCFS_Integrated_Knowledge_Base::instance();') !== false,
     'integrated activation included' => strpos($main, 'SCFS_Integrated_Knowledge_Base::activate();') !== false,
@@ -36,8 +36,8 @@ $checks = array(
     'documentation intelligence CSS exists' => file_exists($plugin . '/assets/documentation-intelligence.css'),
     'documentation guide exists' => file_exists($root . '/docs/integrated-knowledge-base-documentation-library.md'),
     'release notes exist' => file_exists($root . '/RELEASE_NOTES_5.1.0.md'),
-    'manifest version' => ($manifest['version'] ?? '') === '7.8.0',
-    'manifest release name' => ($manifest['release_name'] ?? '') === 'GitHub Release Intelligence',
+    'manifest version' => ($manifest['version'] ?? '') === '7.8.1',
+    'manifest release name' => ($manifest['release_name'] ?? '') === 'Private Repository Release Bridge',
     'manifest integrated corpus capability' => in_array('integrated first-party 96-article Knowledge Base corpus', $manifest['capabilities'] ?? array(), true),
     'manifest usefulness capability' => in_array('anonymous visitor usefulness ratings with duplicate protection', $manifest['capabilities'] ?? array(), true),
 );

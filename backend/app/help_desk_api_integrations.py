@@ -1,4 +1,4 @@
-"""Help Desk API, Webhooks, and External Integrations v7.8.0."""
+"""Help Desk API, Webhooks, and External Integrations v7.8.1."""
 from __future__ import annotations
 
 from hashlib import sha256
@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-help-desk-api-integrations/1.0"
 ALLOWED_SCOPES = {
     "cases.read_summary", "cases.write_relationships", "known_issues.read",

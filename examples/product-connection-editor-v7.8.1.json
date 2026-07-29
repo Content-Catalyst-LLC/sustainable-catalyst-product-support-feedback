@@ -1,0 +1,53 @@
+{
+  "schema": "scfs-product-connection-editor/1.0",
+  "version": "7.8.1",
+  "canonical_id": "product-support-feedback",
+  "identity": {
+    "name": "Sustainable Catalyst Product Support and Feedback Platform",
+    "short_name": "Support and Feedback",
+    "family": "foundation",
+    "lifecycle_state": "active"
+  },
+  "wordpress": {
+    "plugin_file": "sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php",
+    "active": true,
+    "installed_version": "7.8.1"
+  },
+  "github": {
+    "repository_url": "https://github.com/Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback",
+    "default_branch": "main",
+    "latest_version": "7.8.1",
+    "version_source": "github_release"
+  },
+  "console": {
+    "included": true,
+    "screen": "foundation",
+    "display_order": 20,
+    "badges": [
+      "connected",
+      "validated"
+    ]
+  },
+  "routes": {
+    "product_url": "",
+    "documentation_url": "/support/",
+    "support_url": "/support/",
+    "release_notes_url": ""
+  },
+  "aliases": {
+    "legacy_names": [
+      "Feature Suggestions"
+    ],
+    "plugin_files": [],
+    "plugin_slugs": [
+      "sustainable-catalyst-feature-suggestions"
+    ],
+    "text_domains": [
+      "sustainable-catalyst-feature-suggestions"
+    ]
+  },
+  "validation": {
+    "valid": true,
+    "issue_count": 0
+  }
+}

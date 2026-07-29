@@ -15,7 +15,7 @@ def test_help_desk_capabilities_endpoint():
     response = client.get("/v1/help-desk/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-help-desk-case/1.0"
     assert data["public_case_api"] is False
     assert data["identity_authority"] == "contact-engagement"

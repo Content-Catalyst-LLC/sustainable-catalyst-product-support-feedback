@@ -17,7 +17,7 @@ def repository(**overrides):
         "repository_visibility": "private",
         "repository_private": True,
         "release_state": "stable_release",
-        "release_tag": "v7.8.0",
+        "release_tag": "v7.8.1",
         "release_author": "tariqahmad",
         "sync_state": "current",
         "release_assets": [GitHubReleaseAsset(name="release.zip", size=100)],

@@ -9,5 +9,5 @@ foreach (array('activated_plugin','deactivated_plugin','deleted_plugin','upgrade
     if (strpos($class, $needle) === false) { fwrite(STDERR, "FAIL refresh: {$needle}
 "); exit(1); }
 }
-echo "v7.8.0 controlled plugin matching and refresh contract passed.
+echo "v7.8.1 controlled plugin matching and refresh contract passed.
 ";

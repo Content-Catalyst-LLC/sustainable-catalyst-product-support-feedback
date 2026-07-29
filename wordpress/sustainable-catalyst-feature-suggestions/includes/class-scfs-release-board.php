@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Release_Board {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-release-board/1.3';
     const SHORTCODE = 'sc_release_board';
     const STYLE_HANDLE = 'scfs-release-board';
@@ -47,7 +47,7 @@ final class SCFS_Release_Board {
     }
 
     public function register_assets() {
-        $relative = 'assets/release-board-v7.8.0.css';
+        $relative = 'assets/release-board-v7.8.1.css';
         $path = plugin_dir_path(dirname(__FILE__)) . $relative;
         $version = is_file($path) ? (string) filemtime($path) : self::VERSION;
         wp_register_style(
@@ -56,7 +56,7 @@ final class SCFS_Release_Board {
             array(),
             $version
         );
-        $script_relative = 'assets/release-console-v7.8.0.js';
+        $script_relative = 'assets/release-console-v7.8.1.js';
         $script_path = plugin_dir_path(dirname(__FILE__)) . $script_relative;
         $script_version = is_file($script_path) ? (string) filemtime($script_path) : self::VERSION;
         wp_register_script(
@@ -523,7 +523,8 @@ final class SCFS_Release_Board {
         $documentation_state = sanitize_key($product['documentation_state'] ?? 'unavailable');
         $known_issue_count = absint($product['known_issue_count'] ?? 0);
         $recently_updated = !empty($product['recently_updated']);
-        $github_commit = substr(sanitize_text_field($product['github_latest_commit_sha'] ?? ''), 0, 7);
+        $private_repository = !empty($product['github_repository_private']) || sanitize_key($product['github_repository_visibility'] ?? '') === 'private';
+        $github_commit = $private_repository ? '' : substr(sanitize_text_field($product['github_latest_commit_sha'] ?? ''), 0, 7);
         $github_updated = $this->release_date_label($product['github_repository_updated_at'] ?? ($product['github_last_synced_at'] ?? ''));
         $custom_badges = array_values(array_filter(array_map('sanitize_text_field', (array) ($product['console_badges'] ?? array()))));
         $copy = $this->console_copy();

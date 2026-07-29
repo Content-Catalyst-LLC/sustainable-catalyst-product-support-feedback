@@ -62,7 +62,7 @@ def test_legal_hold_blocks_delete():
 
 def test_backup_snapshot_requires_encryption_offsite_and_restore_test():
     good_hash = "a" * 64
-    result = evaluate_backup_snapshot(BackupSnapshotEvidence(snapshot_id="snapshot-20260720", created_at="2026-07-20T12:00:00Z", source_version="7.8.0", database_sha256=good_hash, files_sha256=good_hash, encrypted=True, offsite_copy=True, restore_tested=True, age_hours=6))
+    result = evaluate_backup_snapshot(BackupSnapshotEvidence(snapshot_id="snapshot-20260720", created_at="2026-07-20T12:00:00Z", source_version="7.8.1", database_sha256=good_hash, files_sha256=good_hash, encrypted=True, offsite_copy=True, restore_tested=True, age_hours=6))
     assert result.valid is True
     assert result.state == "healthy"
     assert result.automatic_restore is False
@@ -95,7 +95,7 @@ def test_production_gate_can_be_conditionally_ready():
 
 
 def test_report_integrity():
-    payload = {"version": "7.8.0", "security": {"state": "ready"}, "recovery": {"state": "verified"}}
+    payload = {"version": "7.8.1", "security": {"state": "ready"}, "recovery": {"state": "verified"}}
     digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
     result = verify_hardening_report(HardeningReportEvidence(payload=payload, sha256=digest))
     assert result.valid is True
@@ -106,7 +106,7 @@ def test_capabilities_endpoint():
     response = TestClient(app).get("/v1/help-desk/production-hardening/capabilities")
     assert response.status_code == 200
     body = response.json()
-    assert body["version"] == "7.8.0"
+    assert body["version"] == "7.8.1"
     assert body["schema"] == "scfs-help-desk-production-hardening/1.0"
     assert body["automatic_destructive_privacy_action"] is False
     assert body["automatic_production_restore"] is False

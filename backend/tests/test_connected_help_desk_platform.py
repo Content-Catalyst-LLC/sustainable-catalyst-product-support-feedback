@@ -89,7 +89,7 @@ def test_dossier_private_content_fails_privacy():
 
 
 def test_connected_report_integrity():
-    payload = {"version": "7.8.0", "state": "connected", "layers": 7}
+    payload = {"version": "7.8.1", "state": "connected", "layers": 7}
     digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()).hexdigest()
     result = verify_connected_report(ConnectedReportEvidence(payload=payload, sha256=digest))
     assert result.valid is True
@@ -99,7 +99,7 @@ def test_capabilities_endpoint():
     response = TestClient(app).get("/v1/help-desk/connected-platform/capabilities")
     assert response.status_code == 200
     body = response.json()
-    assert body["version"] == "7.8.0"
+    assert body["version"] == "7.8.1"
     assert body["schema"] == "scfs-connected-help-desk-platform/1.0"
     assert body["human_command_authorization_required"] is True
 

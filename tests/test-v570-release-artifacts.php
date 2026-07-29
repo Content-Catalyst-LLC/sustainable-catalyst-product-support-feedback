@@ -26,7 +26,7 @@ $example = json_decode(file_get_contents($root . '/examples/support-analytics-do
 $checks = array(
     'release manifest version' => ($manifest['version'] ?? '') === '5.7.0',
     'release manifest name' => ($manifest['release_name'] ?? '') === 'Support Analytics and Documentation Effectiveness',
-    'feature manifest version' => ($feature['version'] ?? '') === '7.8.0',
+    'feature manifest version' => ($feature['version'] ?? '') === '7.8.1',
     'analytics schema' => ($feature['support_analytics']['schema'] ?? '') === 'scfs-support-analytics-documentation-effectiveness/1.0',
     'no database migration' => ($manifest['compatibility']['database_migration_required'] ?? null) === false,
     'schema version contract' => ($schema['properties']['version']['const'] ?? '') === '5.7.0',

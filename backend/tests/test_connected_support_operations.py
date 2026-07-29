@@ -79,7 +79,7 @@ def test_connected_operations_capabilities_endpoint():
     response = TestClient(app).get("/v1/connected-operations/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["human_review_required"] is True
     assert data["automatic_private_case_creation"] is False
 

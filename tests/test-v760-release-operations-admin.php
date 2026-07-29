@@ -4,10 +4,10 @@ $plugin = $root . '/wordpress/sustainable-catalyst-feature-suggestions';
 $main = file_get_contents($plugin . '/sustainable-catalyst-feature-suggestions.php');
 $class = file_get_contents($plugin . '/includes/class-scfs-release-operations-admin.php');
 $settings = file_get_contents($plugin . '/includes/class-scfs-github-connection-settings.php');
-$css = file_get_contents($plugin . '/assets/release-operations-v7.8.0.css');
-$js = file_get_contents($plugin . '/assets/release-operations-v7.8.0.js');
-$manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest-v7.8.0.json'), true);
-$release = json_decode(file_get_contents($root . '/release-manifest-v7.8.0.json'), true);
+$css = file_get_contents($plugin . '/assets/release-operations-v7.8.1.css');
+$js = file_get_contents($plugin . '/assets/release-operations-v7.8.1.js');
+$manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest-v7.8.1.json'), true);
+$release = json_decode(file_get_contents($root . '/release-manifest-v7.8.1.json'), true);
 $checks = array(
     'class loaded' => strpos($main, 'class-scfs-release-operations-admin.php') !== false,
     'class initialized' => strpos($main, 'SCFS_Release_Operations_Admin::instance();') !== false,
@@ -25,7 +25,7 @@ $checks = array(
     'responsive table' => strpos($css, '@media (max-width: 900px)') !== false && strpos($css, 'content: attr(data-label)') !== false,
     'reduced motion' => strpos($css, '@media (prefers-reduced-motion: reduce)') !== false,
     'select all script' => strpos($js, 'data-scfs-select-all') !== false && strpos($js, 'indeterminate') !== false,
-    'release identity' => ($manifest['version'] ?? '') === '7.8.0' && ($release['version'] ?? '') === '7.8.0',
+    'release identity' => ($manifest['version'] ?? '') === '7.8.1' && ($release['version'] ?? '') === '7.8.1',
     'manifest operations' => !empty($manifest['release_operations_admin']['all_products_operational_table']) && !empty($release['validation']['release_operations_admin']),
 );
 foreach ($checks as $label => $passed) {
@@ -34,4 +34,4 @@ foreach ($checks as $label => $passed) {
         exit(1);
     }
 }
-echo 'v7.8.0 Release Operations administration contract passed (' . count($checks) . " checks).\n";
+echo 'v7.8.1 Release Operations administration contract passed (' . count($checks) . " checks).\n";

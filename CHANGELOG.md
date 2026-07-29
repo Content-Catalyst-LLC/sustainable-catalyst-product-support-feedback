@@ -1,3 +1,14 @@
+# Changelog
+
+## 7.8.1 — Private Repository Release Bridge
+
+- Added least-privilege GitHub App installation authentication for selected private repositories.
+- Added RS256 JWT generation, short-lived installation-token caching, early refresh, and one-time 401 retry.
+- Added encrypted private-key administration with constant and environment overrides.
+- Redacted private repository URLs, release links, tag links, and commit identifiers from public registry and Release Console output.
+- Restricted complete registry REST output to administrators while preserving redacted editor access.
+- Preserved fine-grained token fallback, signed webhooks, hourly reconciliation, manual sync, and legacy shortcodes.
+
 ## 7.8.0 — GitHub Release Intelligence
 
 - Added stable-release-first and explicitly governed prerelease authority while excluding drafts.

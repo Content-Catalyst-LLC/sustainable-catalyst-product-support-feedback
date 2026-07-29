@@ -1,0 +1,49 @@
+{
+  "schema": "scfs-release-operations/1.0",
+  "version": "7.8.1",
+  "generated_at": "2026-07-23T12:00:00Z",
+  "summary": {
+    "products": 17,
+    "active_plugins": 12,
+    "repositories": 16,
+    "current": 12,
+    "updates": 1,
+    "errors": 1,
+    "stale": 2,
+    "unconfigured": 1,
+    "semantic_tags": 1,
+    "no_releases": 1
+  },
+  "products": [
+    {
+      "canonical_id": "product-support-feedback",
+      "name": "Sustainable Catalyst Product Support and Feedback Platform",
+      "lifecycle_state": "active",
+      "public_visible": true,
+      "homepage_visible": true,
+      "plugin_name": "Sustainable Catalyst Product Support and Feedback Platform",
+      "plugin_active": true,
+      "activation_scope": "site",
+      "installed_version": "7.8.1",
+      "repository_url": "https://github.com/Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback",
+      "github_sync_enabled": true,
+      "github_sync_state": "current",
+      "github_sync_message": "",
+      "github_version": "7.8.1",
+      "github_version_source": "github_release",
+      "public_version": "7.8.1",
+      "status": "current",
+      "last_synced_at": "2026-07-23T12:00:00Z",
+      "freshness": "current",
+      "operational_state": "current",
+      "plugin_file": "sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php",
+      "github_connection_state": "connected",
+      "github_sync_error_code": "",
+      "github_sync_http_status": "",
+      "github_sync_endpoint": "",
+      "github_sync_endpoint_url": "",
+      "github_sync_failed_at": "",
+      "github_commit_sync_warning": ""
+    }
+  ]
+}

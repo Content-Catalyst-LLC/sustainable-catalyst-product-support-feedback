@@ -11,7 +11,7 @@ function apply_filters($hook, $value) { return $value; }
 function __($text) { return $text; }
 require dirname(__DIR__) . '/wordpress/sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php';
 $checks = array(
-    'main version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.0',
+    'main version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.1',
     'connected operations loaded' => class_exists('SCFS_Connected_Support_Operations'),
     'connected operations version' => SCFS_Connected_Support_Operations::VERSION === '5.1.0',
     'connected operations schema version' => SCFS_Connected_Support_Operations::SCHEMA_VERSION === '1.0',

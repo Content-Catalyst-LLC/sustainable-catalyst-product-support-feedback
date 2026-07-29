@@ -6,7 +6,7 @@ function add_submenu_page() {}
 function get_option($key, $default = false) { return array_key_exists($key, $GLOBALS['scfs_test_options']) ? $GLOBALS['scfs_test_options'][$key] : $default; }
 function add_option($key, $value) { $GLOBALS['scfs_test_options'][$key] = $value; return true; }
 function update_option($key, $value) { $GLOBALS['scfs_test_options'][$key] = $value; return true; }
-function wp_salt() { return 'v7.8.0-test-auth-salt-with-sufficient-entropy'; }
+function wp_salt() { return 'v7.8.1-test-auth-salt-with-sufficient-entropy'; }
 function __($text) { return $text; }
 function is_wp_error($value) { return $value instanceof WP_Error; }
 class WP_Error {
@@ -44,4 +44,4 @@ if ($service->token_source() !== 'environment' || $service->token() !== $environ
     exit(1);
 }
 putenv('SCFS_GITHUB_TOKEN');
-echo "v7.8.0 encrypted credential runtime contract passed.\n";
+echo "v7.8.1 encrypted credential runtime contract passed.\n";

@@ -26,7 +26,7 @@ $example = json_decode(file_get_contents($root . '/examples/feedback-product-sig
 $checks = array(
     'release manifest version' => ($manifest['version'] ?? '') === '5.6.0',
     'release manifest name' => ($manifest['release_name'] ?? '') === 'Feedback Intelligence and Product Signals',
-    'feature manifest current version' => ($feature['version'] ?? '') === '7.8.0',
+    'feature manifest current version' => ($feature['version'] ?? '') === '7.8.1',
     'feature manifest signal schema' => ($feature['feedback_product_signals']['schema'] ?? '') === 'scfs-feedback-product-signals/1.0',
     'no database migration' => ($manifest['compatibility']['database_migration_required'] ?? null) === false,
     'schema version contract' => ($schema['properties']['version']['const'] ?? '') === '5.6.0',

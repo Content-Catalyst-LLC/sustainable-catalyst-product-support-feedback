@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Canonical_Product_Registry_Admin {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-canonical-product-registry-admin/1.0';
     const ADMIN_SLUG = 'scfs-product-registry';
     const HISTORY_OPTION = 'scfs_canonical_product_registry_admin_history';
@@ -99,8 +99,8 @@ final class SCFS_Canonical_Product_Registry_Admin {
             return;
         }
         $base = plugin_dir_url(dirname(__FILE__)) . 'assets/';
-        wp_enqueue_style('scfs-canonical-product-registry-admin-v770', $base . 'canonical-product-registry-admin-v7.8.0.css', array(), self::VERSION);
-        wp_enqueue_script('scfs-canonical-product-registry-admin-v770', $base . 'canonical-product-registry-admin-v7.8.0.js', array(), self::VERSION, true);
+        wp_enqueue_style('scfs-canonical-product-registry-admin-v770', $base . 'canonical-product-registry-admin-v7.8.1.css', array(), self::VERSION);
+        wp_enqueue_script('scfs-canonical-product-registry-admin-v770', $base . 'canonical-product-registry-admin-v7.8.1.js', array(), self::VERSION, true);
     }
 
     private function user_context() {

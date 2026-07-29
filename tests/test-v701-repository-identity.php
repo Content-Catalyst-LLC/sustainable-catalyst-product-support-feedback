@@ -4,7 +4,7 @@ $current = json_decode(file_get_contents($root . '/feature_suggestions_manifest.
 $historical = json_decode(file_get_contents($root . '/feature_suggestions_manifest-v7.0.0.json'), true);
 $release = json_decode(file_get_contents($root . '/release-manifest-v7.0.1.json'), true);
 $checks = array(
-    'current version' => ($current['version'] ?? '') === '7.8.0',
+    'current version' => ($current['version'] ?? '') === '7.8.1',
     'canonical repository' => ($current['repository'] ?? '') === 'Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback',
     'legacy repository recorded' => ($current['repository_identity']['legacy_repository'] ?? '') === 'Content-Catalyst-LLC/sustainable-catalyst-feature-suggestions',
     'canonical local folder' => ($current['repository_identity']['canonical_local_directory'] ?? '') === 'sustainable-catalyst-product-support-feedback',

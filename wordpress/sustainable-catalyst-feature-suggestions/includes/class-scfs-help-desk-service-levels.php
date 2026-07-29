@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Service_Levels {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-service-levels/1.0';
     const DB_VERSION = '1.3.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_service_levels_db_version';

@@ -1,6 +1,6 @@
 <?php
 $root = dirname(__DIR__);
-$css = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/assets/release-board-v7.8.0.css');
+$css = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/assets/release-board-v7.8.1.css');
 $checks = array(
     'matte terminal background' => strpos($css, '--scfs-telemetry-bg: #07090a') !== false,
     'terminal accent' => strpos($css, '--scfs-telemetry-accent: #74e39a') !== false,
@@ -21,4 +21,4 @@ $checks = array(
 foreach ($checks as $label => $ok) {
     if (!$ok) { fwrite(STDERR, "FAIL: {$label}\n"); exit(1); }
 }
-echo "v7.8.0 Release Console stylesheet contract passed.\n";
+echo "v7.8.1 Release Console stylesheet contract passed.\n";

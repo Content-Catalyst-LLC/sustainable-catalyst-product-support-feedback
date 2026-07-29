@@ -19,7 +19,7 @@ def test_reliability_capabilities_preserve_advisory_boundary():
     response = client.get("/v1/support-reliability/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-support-reliability-center/1.0"
     assert data["automatic_roadmap_change"] is False
     assert data["private_case_content_storage"] is False

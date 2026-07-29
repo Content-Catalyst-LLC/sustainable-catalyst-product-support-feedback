@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Connected_Product_Support_Platform {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-connected-product-support-feedback-platform/1.0';
     const JOURNEY_SCHEMA = 'scfs-connected-support-journey/1.0';
     const SHORTCODE = 'scfs_connected_product_support_platform';

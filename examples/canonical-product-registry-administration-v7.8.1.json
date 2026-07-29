@@ -1,0 +1,33 @@
+{
+  "schema": "scfs-canonical-product-registry-admin/1.0",
+  "version": "7.8.1",
+  "filters": {
+    "search": "",
+    "family": "foundation",
+    "lifecycle": "active",
+    "visibility": "console"
+  },
+  "ordering": {
+    "foundation": [
+      "sustainable-catalyst-core",
+      "product-support-feedback",
+      "contact-engagement",
+      "knowledge-library"
+    ]
+  },
+  "import": {
+    "mode": "dry_run",
+    "valid": true,
+    "added": [],
+    "changed": [
+      "product-support-feedback"
+    ],
+    "removed": []
+  },
+  "governance": {
+    "automatic_backup": true,
+    "administrator_attribution": true,
+    "canonical_id_immutable": true,
+    "human_review_required": true
+  }
+}

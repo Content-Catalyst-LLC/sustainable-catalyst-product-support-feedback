@@ -1,0 +1,139 @@
+.scfs-github-release-intelligence {
+    max-width: 1500px;
+}
+
+.scfs-gri-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.scfs-gri-summary > div {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.scfs-gri-summary strong,
+.scfs-gri-summary span {
+    display: block;
+}
+
+.scfs-gri-summary span {
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+}
+
+.scfs-gri-settings,
+.scfs-gri-table-wrap,
+.scfs-gri-history-grid > section {
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.scfs-gri-product-checks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px 18px;
+    max-width: 900px;
+}
+
+.scfs-gri-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin: 18px 0;
+}
+
+.scfs-gri-actions form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+}
+
+.scfs-gri-table-wrap {
+    overflow-x: auto;
+}
+
+.scfs-gri-table {
+    min-width: 1050px;
+}
+
+.scfs-gri-table code,
+.scfs-gri-table small {
+    display: block;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.scfs-gri-table details ul {
+    margin: 8px 0 0 18px;
+}
+
+.scfs-gri-history-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.scfs-gri-history {
+    max-height: 420px;
+    overflow: auto;
+    margin: 0;
+    padding-left: 24px;
+}
+
+.scfs-gri-history li {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.scfs-gri-history span,
+.scfs-gri-history small {
+    display: block;
+    margin-top: 3px;
+}
+
+@media (max-width: 960px) {
+    .scfs-gri-summary,
+    .scfs-gri-history-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 782px) {
+    .scfs-gri-summary,
+    .scfs-gri-history-grid,
+    .scfs-gri-product-checks {
+        grid-template-columns: 1fr;
+    }
+
+    .scfs-gri-actions,
+    .scfs-gri-actions form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .scfs-gri-actions select,
+    .scfs-gri-actions .button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scfs-github-release-intelligence *,
+    .scfs-github-release-intelligence *::before,
+    .scfs-github-release-intelligence *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+    }
+}

@@ -17,7 +17,7 @@
       "const": "scfs-installed-plugin-discovery/1.0"
     },
     "version": {
-      "const": "7.8.0"
+      "const": "7.8.1"
     },
     "scanned_at": {
       "type": "string"

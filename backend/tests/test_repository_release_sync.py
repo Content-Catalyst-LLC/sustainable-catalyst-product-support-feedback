@@ -19,7 +19,7 @@ def test_repository_capabilities_preserve_governance_boundary():
     response = client.get("/v1/repository-sync/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-repository-release-synchronization/1.0"
     assert data["automatic_approval"] is False
     assert data["automatic_publication"] is False

@@ -14,13 +14,14 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_GitHub_Connection_Settings {
-    const VERSION = '7.8.0';
-    const SCHEMA = 'scfs-github-connection-settings/1.0';
+    const VERSION = '7.8.1';
+    const SCHEMA = 'scfs-github-connection-settings/1.1';
     const OPTION_KEY = 'scfs_github_connection_settings';
     const ADMIN_SLUG = 'scfs-github-connection';
     const NONCE_ACTION = 'scfs_save_github_connection';
     const TEST_NONCE_ACTION = 'scfs_test_github_connection';
     const TEST_TRANSIENT_PREFIX = 'scfs_github_connection_test_';
+    const INSTALLATION_TOKEN_TRANSIENT_PREFIX = 'scfs_github_app_installation_token_';
 
     private static $instance = null;
 
@@ -48,8 +49,15 @@ final class SCFS_GitHub_Connection_Settings {
         return array(
             'schema' => self::SCHEMA,
             'version' => self::VERSION,
+            'authentication_modes' => array('github_app_installation', 'fine_grained_personal_access_token', 'anonymous_public'),
+            'preferred_authentication' => 'github_app_installation',
+            'github_app_sources' => array('wp_config_constant', 'environment_variable', 'encrypted_wordpress_option'),
+            'github_app_installation_tokens' => true,
+            'github_app_installation_token_ttl_seconds' => 3600,
+            'github_app_permissions' => array('contents' => 'read', 'metadata' => 'read'),
+            'github_app_selected_repository_installation' => true,
             'token_sources' => array('wp_config_constant', 'environment_variable', 'encrypted_wordpress_option'),
-            'token_source_precedence' => array('wp_config_constant', 'environment_variable', 'encrypted_wordpress_option'),
+            'token_source_precedence' => array('github_app_installation', 'wp_config_constant', 'environment_variable', 'encrypted_wordpress_option'),
             'credentials_rendered' => false,
             'credentials_logged' => false,
             'autoload' => false,
@@ -144,6 +152,191 @@ final class SCFS_GitHub_Connection_Settings {
         return $this->decrypt_secret($settings['token_encrypted'] ?? '');
     }
 
+    private function external_value($constant_name, $environment_name) {
+        if (defined($constant_name)) {
+            $value = constant($constant_name);
+            if (is_scalar($value) && trim((string) $value) !== '') {
+                return trim((string) $value);
+            }
+        }
+        $value = getenv($environment_name);
+        return is_string($value) ? trim($value) : '';
+    }
+
+    private function normalize_private_key($private_key) {
+        $private_key = trim((string) $private_key);
+        if ($private_key === '') {
+            return '';
+        }
+        return str_replace(array("\r\n", '\\n'), array("\n", "\n"), $private_key);
+    }
+
+    public function github_app_id_source() {
+        if ($this->external_value('SCFS_GITHUB_APP_ID', 'SCFS_GITHUB_APP_ID') !== '') {
+            return defined('SCFS_GITHUB_APP_ID') ? 'wp_config' : 'environment';
+        }
+        $settings = $this->settings();
+        return !empty($settings['github_app_id']) ? 'wordpress' : 'none';
+    }
+
+    public function github_app_id() {
+        $external = $this->external_value('SCFS_GITHUB_APP_ID', 'SCFS_GITHUB_APP_ID');
+        if ($external !== '') {
+            return preg_replace('/[^A-Za-z0-9_-]/', '', $external);
+        }
+        $settings = $this->settings();
+        return preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($settings['github_app_id'] ?? ''));
+    }
+
+    public function github_app_installation_id_source() {
+        if ($this->external_value('SCFS_GITHUB_APP_INSTALLATION_ID', 'SCFS_GITHUB_APP_INSTALLATION_ID') !== '') {
+            return defined('SCFS_GITHUB_APP_INSTALLATION_ID') ? 'wp_config' : 'environment';
+        }
+        $settings = $this->settings();
+        return !empty($settings['github_app_installation_id']) ? 'wordpress' : 'none';
+    }
+
+    public function github_app_installation_id() {
+        $external = $this->external_value('SCFS_GITHUB_APP_INSTALLATION_ID', 'SCFS_GITHUB_APP_INSTALLATION_ID');
+        if ($external !== '') {
+            return absint($external);
+        }
+        $settings = $this->settings();
+        return absint($settings['github_app_installation_id'] ?? 0);
+    }
+
+    public function github_app_private_key_source() {
+        if ($this->external_value('SCFS_GITHUB_APP_PRIVATE_KEY', 'SCFS_GITHUB_APP_PRIVATE_KEY') !== '') {
+            return defined('SCFS_GITHUB_APP_PRIVATE_KEY') ? 'wp_config' : 'environment';
+        }
+        $settings = $this->settings();
+        return $this->decrypt_secret($settings['github_app_private_key_encrypted'] ?? '') !== '' ? 'wordpress' : 'none';
+    }
+
+    public function github_app_private_key() {
+        $external = $this->external_value('SCFS_GITHUB_APP_PRIVATE_KEY', 'SCFS_GITHUB_APP_PRIVATE_KEY');
+        if ($external !== '') {
+            return $this->normalize_private_key($external);
+        }
+        $settings = $this->settings();
+        return $this->normalize_private_key($this->decrypt_secret($settings['github_app_private_key_encrypted'] ?? ''));
+    }
+
+    public function github_app_configured() {
+        return $this->github_app_id() !== '' && $this->github_app_installation_id() > 0 && $this->github_app_private_key() !== '';
+    }
+
+    public function authentication_source() {
+        if ($this->github_app_configured()) {
+            return 'github_app_' . $this->github_app_private_key_source();
+        }
+        return $this->token_source();
+    }
+
+    private function base64url_encode($value) {
+        return rtrim(strtr(base64_encode((string) $value), '+/', '-_'), '=');
+    }
+
+    private function github_app_jwt() {
+        if (!$this->github_app_configured()) {
+            return new WP_Error('scfs_github_app_incomplete', __('The GitHub App ID, installation ID, and private key must all be configured.', 'sustainable-catalyst-feature-suggestions'));
+        }
+        if (!function_exists('openssl_sign') || !function_exists('openssl_pkey_get_private')) {
+            return new WP_Error('scfs_github_app_openssl_unavailable', __('OpenSSL signing is required for GitHub App authentication.', 'sustainable-catalyst-feature-suggestions'));
+        }
+        $private_key = openssl_pkey_get_private($this->github_app_private_key());
+        if ($private_key === false) {
+            return new WP_Error('scfs_github_app_private_key_invalid', __('The stored GitHub App private key is invalid.', 'sustainable-catalyst-feature-suggestions'));
+        }
+        $now = time();
+        $header = $this->base64url_encode(wp_json_encode(array('alg' => 'RS256', 'typ' => 'JWT')));
+        $payload = $this->base64url_encode(wp_json_encode(array(
+            'iat' => $now - 60,
+            'exp' => $now + 540,
+            'iss' => (string) $this->github_app_id(),
+        )));
+        $signing_input = $header . '.' . $payload;
+        $signature = '';
+        $signed = openssl_sign($signing_input, $signature, $private_key, OPENSSL_ALGO_SHA256);
+        if (function_exists('openssl_pkey_free')) {
+            @openssl_pkey_free($private_key);
+        }
+        if (!$signed) {
+            return new WP_Error('scfs_github_app_jwt_signing_failed', __('The GitHub App JWT could not be signed.', 'sustainable-catalyst-feature-suggestions'));
+        }
+        return $signing_input . '.' . $this->base64url_encode($signature);
+    }
+
+    private function installation_token_transient_key() {
+        $fingerprint = hash('sha256', $this->github_app_id() . '|' . $this->github_app_installation_id() . '|' . $this->github_app_private_key());
+        return self::INSTALLATION_TOKEN_TRANSIENT_PREFIX . substr($fingerprint, 0, 24);
+    }
+
+    public function invalidate_installation_token() {
+        if ($this->github_app_configured()) {
+            delete_transient($this->installation_token_transient_key());
+        }
+    }
+
+    public function installation_token($force_refresh = false) {
+        if (!$this->github_app_configured()) {
+            return new WP_Error('scfs_github_app_not_configured', __('GitHub App authentication is not configured.', 'sustainable-catalyst-feature-suggestions'));
+        }
+        $cache_key = $this->installation_token_transient_key();
+        if (!$force_refresh) {
+            $cached = get_transient($cache_key);
+            if (is_array($cached) && !empty($cached['token']) && (int) ($cached['expires_at_unix'] ?? 0) > time() + 120) {
+                return (string) $cached['token'];
+            }
+        }
+        $jwt = $this->github_app_jwt();
+        if (is_wp_error($jwt)) {
+            return $jwt;
+        }
+        $endpoint = 'https://api.github.com/app/installations/' . $this->github_app_installation_id() . '/access_tokens';
+        $response = wp_remote_post($endpoint, array(
+            'timeout' => 15,
+            'redirection' => 0,
+            'headers' => array(
+                'Accept' => 'application/vnd.github+json',
+                'Authorization' => 'Bearer ' . $jwt,
+                'Content-Type' => 'application/json',
+                'User-Agent' => 'Sustainable-Catalyst-Product-Support/' . self::VERSION,
+                'X-GitHub-Api-Version' => '2026-03-10',
+            ),
+            'body' => wp_json_encode(array(
+                'permissions' => array(
+                    'contents' => 'read',
+                    'metadata' => 'read',
+                ),
+            )),
+        ));
+        if (is_wp_error($response)) {
+            return new WP_Error('scfs_github_app_token_network_error', sprintf(__('GitHub App token request failed: %s', 'sustainable-catalyst-feature-suggestions'), $response->get_error_message()));
+        }
+        $status = (int) wp_remote_retrieve_response_code($response);
+        $decoded = json_decode((string) wp_remote_retrieve_body($response), true);
+        if ($status < 200 || $status >= 300 || !is_array($decoded) || empty($decoded['token'])) {
+            $message = is_array($decoded) && !empty($decoded['message']) ? sanitize_text_field($decoded['message']) : __('GitHub did not return an installation access token.', 'sustainable-catalyst-feature-suggestions');
+            return new WP_Error('scfs_github_app_token_rejected', sprintf(__('GitHub App token request returned HTTP %1$d: %2$s', 'sustainable-catalyst-feature-suggestions'), $status, $message), array('status' => $status, 'endpoint' => 'app_installation_token'));
+        }
+        $expires_at_unix = !empty($decoded['expires_at']) ? (int) strtotime($decoded['expires_at']) : time() + HOUR_IN_SECONDS;
+        $ttl = max(60, min(55 * MINUTE_IN_SECONDS, $expires_at_unix - time() - 300));
+        set_transient($cache_key, array(
+            'token' => (string) $decoded['token'],
+            'expires_at' => sanitize_text_field($decoded['expires_at'] ?? ''),
+            'expires_at_unix' => $expires_at_unix,
+        ), $ttl);
+        return (string) $decoded['token'];
+    }
+
+    public function authorization_token($force_refresh = false) {
+        if ($this->github_app_configured()) {
+            return $this->installation_token($force_refresh);
+        }
+        return $this->token();
+    }
+
     public function webhook_secret_source() {
         if (defined('SCFS_GITHUB_WEBHOOK_SECRET') && trim((string) SCFS_GITHUB_WEBHOOK_SECRET) !== '') {
             return 'wp_config';
@@ -176,6 +369,9 @@ final class SCFS_GitHub_Connection_Settings {
             'wp_config' => __('Configured in wp-config.php', 'sustainable-catalyst-feature-suggestions'),
             'environment' => __('Configured as a server environment variable', 'sustainable-catalyst-feature-suggestions'),
             'wordpress' => __('Stored securely in WordPress', 'sustainable-catalyst-feature-suggestions'),
+            'github_app_wp_config' => __('GitHub App configured in wp-config.php', 'sustainable-catalyst-feature-suggestions'),
+            'github_app_environment' => __('GitHub App configured as server environment variables', 'sustainable-catalyst-feature-suggestions'),
+            'github_app_wordpress' => __('GitHub App stored securely in WordPress', 'sustainable-catalyst-feature-suggestions'),
             'none' => __('Not configured', 'sustainable-catalyst-feature-suggestions'),
         );
         return $labels[$source] ?? $labels['none'];
@@ -224,6 +420,7 @@ final class SCFS_GitHub_Connection_Settings {
             wp_die(esc_html__('You do not have permission to manage the GitHub connection.', 'sustainable-catalyst-feature-suggestions'));
         }
         $token_source = $this->token_source();
+        $authentication_source = $this->authentication_source();
         $webhook_source = $this->webhook_secret_source();
         $footer = class_exists('SCFS_Release_Console_Copy') ? SCFS_Release_Console_Copy::instance()->footer_settings() : array();
         $next_sync = class_exists('SCFS_Canonical_Product_GitHub_Sync') ? SCFS_Canonical_Product_GitHub_Sync::instance()->next_scheduled_sync() : false;
@@ -232,7 +429,7 @@ final class SCFS_GitHub_Connection_Settings {
             delete_transient($this->test_transient_key());
         }
         echo '<div class="wrap scfs-github-connection"><h1>' . esc_html__('GitHub Connection', 'sustainable-catalyst-feature-suggestions') . '</h1>';
-        echo '<p>' . esc_html__('Connect private GitHub repositories without editing wp-config.php. The token is encrypted before storage and is never displayed again.', 'sustainable-catalyst-feature-suggestions') . '</p>';
+        echo '<p>' . esc_html__('Connect selected private GitHub repositories through a least-privilege GitHub App. Installation tokens are minted server-side, cached briefly, and never sent to the browser. A fine-grained token remains available as a fallback.', 'sustainable-catalyst-feature-suggestions') . '</p>';
         if (class_exists('SCFS_Release_Operations_Admin')) {
             echo '<p><a class="button button-primary" href="' . esc_url(admin_url('edit.php?post_type=' . Sustainable_Catalyst_Feature_Suggestions::POST_TYPE . '&page=' . SCFS_Release_Operations_Admin::ADMIN_SLUG)) . '">' . esc_html__('Open Release Operations', 'sustainable-catalyst-feature-suggestions') . '</a></p>';
         }
@@ -258,10 +455,12 @@ final class SCFS_GitHub_Connection_Settings {
             echo '</div>';
         }
 
-        echo '<h2>' . esc_html__('Private repository access', 'sustainable-catalyst-feature-suggestions') . '</h2>';
-        echo '<table class="form-table" role="presentation"><tbody><tr><th scope="row">' . esc_html__('Current token status', 'sustainable-catalyst-feature-suggestions') . '</th><td><strong>' . esc_html($this->source_label($token_source)) . '</strong>';
-        if ($token_source === 'wp_config' || $token_source === 'environment') {
-            echo '<p class="description">' . esc_html__('The external token takes priority. Remove it from the server before a WordPress-stored token can be used.', 'sustainable-catalyst-feature-suggestions') . '</p>';
+        echo '<h2>' . esc_html__('Private Repository Release Bridge', 'sustainable-catalyst-feature-suggestions') . '</h2>';
+        echo '<table class="form-table" role="presentation"><tbody><tr><th scope="row">' . esc_html__('Current authentication', 'sustainable-catalyst-feature-suggestions') . '</th><td><strong>' . esc_html($this->source_label($authentication_source)) . '</strong>';
+        if (strpos($authentication_source, 'github_app_') === 0) {
+            echo '<p class="description">' . esc_html(sprintf(__('GitHub App %1$s · installation %2$d · read-only Contents and Metadata permissions.', 'sustainable-catalyst-feature-suggestions'), $this->github_app_id(), $this->github_app_installation_id())) . '</p>';
+        } elseif ($token_source === 'wp_config' || $token_source === 'environment') {
+            echo '<p class="description">' . esc_html__('The external token takes priority over a WordPress-stored fallback token.', 'sustainable-catalyst-feature-suggestions') . '</p>';
         }
         echo '</td></tr><tr><th scope="row">' . esc_html__('Automatic synchronization', 'sustainable-catalyst-feature-suggestions') . '</th><td><strong>' . esc_html($next_sync ? __('Scheduled hourly', 'sustainable-catalyst-feature-suggestions') : __('Schedule will be repaired automatically', 'sustainable-catalyst-feature-suggestions')) . '</strong>';
         if ($next_sync) {
@@ -272,7 +471,10 @@ final class SCFS_GitHub_Connection_Settings {
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="scfs_save_github_connection">';
         wp_nonce_field(self::NONCE_ACTION, 'scfs_github_connection_nonce');
         echo '<table class="form-table" role="presentation"><tbody>';
-        echo '<tr><th scope="row"><label for="scfs-github-token">' . esc_html__('GitHub token', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><input id="scfs-github-token" class="regular-text code" type="password" name="github_token" value="" autocomplete="new-password" placeholder="github_pat_…"><p class="description">' . esc_html__('Paste a fine-grained token with read access to the Content-Catalyst-LLC repositories. Leave blank to keep the current stored token.', 'sustainable-catalyst-feature-suggestions') . '</p><label><input type="checkbox" name="remove_github_token" value="1"> ' . esc_html__('Remove the WordPress-stored token', 'sustainable-catalyst-feature-suggestions') . '</label></td></tr>';
+        echo '<tr><th scope="row"><label for="scfs-github-app-id">' . esc_html__('GitHub App ID', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><input id="scfs-github-app-id" class="regular-text code" name="github_app_id" value="' . esc_attr($this->github_app_id()) . '" inputmode="numeric"><p class="description">' . esc_html__('Use the App ID from the GitHub App settings page, not the client secret.', 'sustainable-catalyst-feature-suggestions') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="scfs-github-app-installation-id">' . esc_html__('Installation ID', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><input id="scfs-github-app-installation-id" class="regular-text code" name="github_app_installation_id" value="' . esc_attr($this->github_app_installation_id()) . '" inputmode="numeric"><p class="description">' . esc_html__('Install the app only on the repositories Release Console is allowed to read.', 'sustainable-catalyst-feature-suggestions') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="scfs-github-app-private-key">' . esc_html__('GitHub App private key', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><textarea id="scfs-github-app-private-key" class="large-text code" rows="6" name="github_app_private_key" autocomplete="new-password" placeholder="-----BEGIN RSA PRIVATE KEY-----"></textarea><p class="description">' . esc_html__('Paste the PEM private key once. It is encrypted before storage and is never rendered back into this page.', 'sustainable-catalyst-feature-suggestions') . ' ' . esc_html(sprintf(__('Current status: %s.', 'sustainable-catalyst-feature-suggestions'), $this->source_label($this->github_app_private_key_source()))) . '</p><label><input type="checkbox" name="remove_github_app" value="1"> ' . esc_html__('Remove the WordPress-stored GitHub App configuration', 'sustainable-catalyst-feature-suggestions') . '</label></td></tr>';
+        echo '<tr><th scope="row"><label for="scfs-github-token">' . esc_html__('Fallback GitHub token', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><input id="scfs-github-token" class="regular-text code" type="password" name="github_token" value="" autocomplete="new-password" placeholder="github_pat_…"><p class="description">' . esc_html__('Optional fallback for sites that cannot use a GitHub App. Leave blank to keep the current stored token.', 'sustainable-catalyst-feature-suggestions') . '</p><label><input type="checkbox" name="remove_github_token" value="1"> ' . esc_html__('Remove the WordPress-stored fallback token', 'sustainable-catalyst-feature-suggestions') . '</label></td></tr>';
         echo '<tr><th scope="row"><label for="scfs-github-webhook-secret">' . esc_html__('Webhook secret', 'sustainable-catalyst-feature-suggestions') . '</label></th><td><input id="scfs-github-webhook-secret" class="regular-text code" type="password" name="webhook_secret" value="" autocomplete="new-password"><p class="description">' . esc_html__('Optional. Use the same secret in GitHub webhooks for immediate updates. Hourly synchronization works without it.', 'sustainable-catalyst-feature-suggestions') . ' ' . esc_html(sprintf(__('Current status: %s.', 'sustainable-catalyst-feature-suggestions'), $this->source_label($webhook_source))) . '</p><label><input type="checkbox" name="remove_webhook_secret" value="1"> ' . esc_html__('Remove the WordPress-stored webhook secret', 'sustainable-catalyst-feature-suggestions') . '</label></td></tr>';
         echo '</tbody></table>';
         echo '<h2>' . esc_html__('Release Console footer links', 'sustainable-catalyst-feature-suggestions') . '</h2>';
@@ -330,6 +532,31 @@ final class SCFS_GitHub_Connection_Settings {
         }
         check_admin_referer(self::NONCE_ACTION, 'scfs_github_connection_nonce');
         $settings = $this->settings();
+        $this->invalidate_installation_token();
+
+        if (!empty($_POST['remove_github_app'])) {
+            unset($settings['github_app_id'], $settings['github_app_installation_id'], $settings['github_app_private_key_encrypted'], $settings['github_app_private_key_updated_at']);
+        }
+        $github_app_id = isset($_POST['github_app_id']) ? preg_replace('/[^A-Za-z0-9_-]/', '', (string) wp_unslash($_POST['github_app_id'])) : '';
+        $github_app_installation_id = isset($_POST['github_app_installation_id']) ? absint(wp_unslash($_POST['github_app_installation_id'])) : 0;
+        if ($github_app_id !== '') {
+            $settings['github_app_id'] = $github_app_id;
+        }
+        if ($github_app_installation_id > 0) {
+            $settings['github_app_installation_id'] = $github_app_installation_id;
+        }
+        $github_app_private_key = isset($_POST['github_app_private_key']) ? $this->normalize_private_key(wp_unslash($_POST['github_app_private_key'])) : '';
+        if ($github_app_private_key !== '') {
+            if (strpos($github_app_private_key, '-----BEGIN ') !== 0 || strpos($github_app_private_key, 'PRIVATE KEY-----') === false || !function_exists('openssl_pkey_get_private') || openssl_pkey_get_private($github_app_private_key) === false) {
+                wp_die(esc_html__('The GitHub App private key is not a valid PEM private key.', 'sustainable-catalyst-feature-suggestions'));
+            }
+            $encrypted = $this->encrypt_secret($github_app_private_key);
+            if (is_wp_error($encrypted)) {
+                wp_die(esc_html($encrypted->get_error_message()));
+            }
+            $settings['github_app_private_key_encrypted'] = $encrypted;
+            $settings['github_app_private_key_updated_at'] = gmdate('c');
+        }
 
         if (!empty($_POST['remove_github_token'])) {
             unset($settings['token_encrypted'], $settings['token_updated_at']);
@@ -388,9 +615,9 @@ final class SCFS_GitHub_Connection_Settings {
             $all_ok = false;
             $message = __('No mapped repositories are available to test.', 'sustainable-catalyst-feature-suggestions');
         } else {
-            $message = $this->token() === ''
-                ? __('Repositories were checked without a token. Public repositories can pass; private repositories require a token.', 'sustainable-catalyst-feature-suggestions')
-                : __('Every mapped repository was checked with the same credential used by WordPress synchronization.', 'sustainable-catalyst-feature-suggestions');
+            $message = $this->authentication_source() === 'none'
+                ? __('Repositories were checked without authentication. Public repositories can pass; private repositories require the GitHub App bridge or a fallback token.', 'sustainable-catalyst-feature-suggestions')
+                : __('Every mapped repository was checked with the same server-side credential used by WordPress synchronization.', 'sustainable-catalyst-feature-suggestions');
             foreach ($repositories as $repository) {
                 $diagnostic = SCFS_Canonical_Product_GitHub_Sync::instance()->diagnose_repository($repository['url']);
                 if (is_wp_error($diagnostic)) {

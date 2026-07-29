@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Institutional_Workspaces {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-institutional-workspaces/1.0';
     const DB_VERSION = '1.9.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_institutional_workspaces_db_version';

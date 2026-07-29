@@ -37,7 +37,7 @@ def rules():
 
 def test_plan_runs_matching_rules_in_priority_order():
     result = plan_workflow(context(), rules())
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
     assert result.schema_ == "scfs-help-desk-workflow-automation/1.0"
     assert result.matched_rules == ["new-case"]
     assert [a.action_type for a in result.actions] == ["schedule_reminder", "suggest_assignment"]
@@ -107,7 +107,7 @@ def test_followup_is_private_and_does_not_send_notification():
 
 
 def test_report_integrity():
-    payload={"version":"7.8.0","case":"SC-2026-000301","actions":2}
+    payload={"version":"7.8.1","case":"SC-2026-000301","actions":2}
     normalized=json.dumps(payload,sort_keys=True,separators=(",",":"),ensure_ascii=True)
     digest=sha256(normalized.encode()).hexdigest()
     result=verify_workflow_report(WorkflowReportEvidence(payload=payload,sha256=digest))
@@ -116,7 +116,7 @@ def test_report_integrity():
 
 def test_capabilities_endpoint():
     data=TestClient(app).get('/v1/help-desk/workflows/capabilities').json()
-    assert data['version']=='7.8.0'
+    assert data['version']=='7.8.1'
     assert data['schema']=='scfs-help-desk-workflow-automation/1.0'
     assert data['automatic_customer_send'] is False
     assert data['automatic_case_closure'] is False

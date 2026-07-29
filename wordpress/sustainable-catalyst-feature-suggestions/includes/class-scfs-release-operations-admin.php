@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Release_Operations_Admin {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-release-operations/1.0';
     const ADMIN_SLUG = 'scfs-release-operations';
     const AUDIT_OPTION = 'scfs_release_operations_audit';
@@ -91,8 +91,8 @@ final class SCFS_Release_Operations_Admin {
         if (strpos((string) $hook_suffix, self::ADMIN_SLUG) === false) {
             return;
         }
-        $css = 'assets/release-operations-v7.8.0.css';
-        $js = 'assets/release-operations-v7.8.0.js';
+        $css = 'assets/release-operations-v7.8.1.css';
+        $js = 'assets/release-operations-v7.8.1.js';
         $css_path = plugin_dir_path(dirname(__FILE__)) . $css;
         $js_path = plugin_dir_path(dirname(__FILE__)) . $js;
         wp_enqueue_style(

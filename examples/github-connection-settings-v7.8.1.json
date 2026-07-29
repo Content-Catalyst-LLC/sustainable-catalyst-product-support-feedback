@@ -1,0 +1,18 @@
+{
+  "schema": "scfs-github-connection-settings/1.1",
+  "version": "7.8.1",
+  "authentication_source": "github_app_wordpress",
+  "authentication_configured": true,
+  "github_app_configured": true,
+  "github_app_id_source": "wordpress",
+  "github_app_installation_id_source": "wordpress",
+  "github_app_private_key_source": "wordpress",
+  "installation_token_cached": true,
+  "installation_token_expires_at": "2026-07-29T05:30:00Z",
+  "token_source": "none",
+  "token_configured": false,
+  "webhook_secret_source": "wordpress",
+  "webhook_secret_configured": true,
+  "mapped_repository_count": 17,
+  "last_tested_at": "2026-07-29T04:45:00Z"
+}

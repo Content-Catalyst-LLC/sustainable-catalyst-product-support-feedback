@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Agent_Workspace {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-agent-workspace/1.0';
     const DB_VERSION = '1.1.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_workspace_db_version';

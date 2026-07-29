@@ -10,4 +10,4 @@ foreach (array("'unknown_plugins_auto_registered' => false", "'unknown_plugins_p
 if (strpos($class, "discovery_enabled") === false || strpos($class, "discovery_locked") === false || strpos($class, "active_plugins_for_mapping") === false) {
     fwrite(STDERR, "FAIL registry-only, active-plugin, or lock boundary\n"); exit(1);
 }
-echo "v7.8.0 plugin discovery governance contract passed.\n";
+echo "v7.8.1 plugin discovery governance contract passed.\n";

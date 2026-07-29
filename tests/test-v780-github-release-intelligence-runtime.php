@@ -52,9 +52,9 @@ $metadata = array(
 );
 $release = array(
     'id' => 780,
-    'name' => 'Preview 7.8.0',
-    'tag_name' => 'v7.8.0-rc.1',
-    'html_url' => 'https://github.com/Content-Catalyst-LLC/new-repository/releases/tag/v7.8.0-rc.1',
+    'name' => 'Preview 7.8.1',
+    'tag_name' => 'v7.8.1-rc.1',
+    'html_url' => 'https://github.com/Content-Catalyst-LLC/new-repository/releases/tag/v7.8.1-rc.1',
     'author' => array('login' => 'release-author'),
     'created_at' => '2026-07-23T20:00:00Z',
     'published_at' => '2026-07-23T20:05:00Z',
@@ -128,4 +128,4 @@ $service->capture_failure('site-intelligence', array(
 ));
 $failed = get_option(SCFS_GitHub_Release_Intelligence::OPTION_KEY, array())['site-intelligence'];
 if (($failed['sync_state'] ?? '') !== 'error' || ($failed['error']['connection_state'] ?? '') !== 'rate_limited') { fwrite(STDERR, "FAIL failure capture\n"); exit(1); }
-echo 'v7.8.0 GitHub Release Intelligence runtime contract passed (' . (count($checks) + 5) . " checks).\n";
+echo 'v7.8.1 Private Repository Release Bridge runtime contract passed (' . (count($checks) + 5) . " checks).\n";

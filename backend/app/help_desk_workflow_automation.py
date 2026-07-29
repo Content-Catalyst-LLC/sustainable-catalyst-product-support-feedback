@@ -1,4 +1,4 @@
-"""Workflow Automation and Operational Rules v7.8.0.
+"""Workflow Automation and Operational Rules v7.8.1.
 
 Deterministic planning contracts for help-desk rules, approvals, templates,
 macros, reminders, and follow-up scheduling. Customer communication and
@@ -14,7 +14,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-help-desk-workflow-automation/1.0"
 
 LOW_RISK_AUTOMATIC_ACTIONS = {"schedule_reminder", "create_review_task", "prepare_internal_note"}

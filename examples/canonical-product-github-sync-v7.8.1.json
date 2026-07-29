@@ -1,0 +1,22 @@
+{
+  "schema": "scfs-canonical-product-github-sync/1.0",
+  "version": "7.8.1",
+  "product_id": "product-support-feedback",
+  "repository_url": "https://github.com/Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback",
+  "default_branch": "main",
+  "latest_version": "2.1.0",
+  "latest_release_url": "https://github.com/Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback/releases/tag/v7.8.1",
+  "latest_commit_sha": "1234567890abcdef1234567890abcdef12345678",
+  "repository_updated_at": "2026-07-22T22:00:00Z",
+  "last_synced_at": "2026-07-22T22:05:00Z",
+  "sync_state": "current",
+  "sync_message": "Repository connected. No GitHub Release is published; console version synchronized from tag v2.1.0.",
+  "latest_tag_name": "v2.1.0",
+  "latest_tag_url": "https://github.com/Content-Catalyst-LLC/sustainable-catalyst-engagement-intake/tree/v2.1.0",
+  "version_source": "github_tag",
+  "connection_state": "semantic_tag",
+  "error_code": "",
+  "http_status": 200,
+  "endpoint": "semantic_tags",
+  "endpoint_url": "https://api.github.com/repos/Content-Catalyst-LLC/sustainable-catalyst-engagement-intake/tags?per_page=100"
+}

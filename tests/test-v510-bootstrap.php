@@ -20,7 +20,7 @@ $allowed_other_record = $integrated->allow_integrated_publication(false, array('
 $property->setValue($integrated, false);
 $allowed_outside_import = $integrated->allow_integrated_publication(false, array('post_type' => SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE), array());
 $checks = array(
-    'main version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.0',
+    'main version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.1',
     'integrated Knowledge Base class loaded' => class_exists('SCFS_Integrated_Knowledge_Base'),
     'integrated Knowledge Base version' => SCFS_Integrated_Knowledge_Base::VERSION === '5.4.0',
     'Knowledge Base foundation retained' => class_exists('SCFS_Knowledge_Base_Foundation'),

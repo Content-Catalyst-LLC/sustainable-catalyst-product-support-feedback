@@ -6,10 +6,10 @@ $editor = file_get_contents($plugin . '/includes/class-scfs-product-connection-e
 $registry = file_get_contents($plugin . '/includes/class-scfs-canonical-product-registry.php');
 $operations = file_get_contents($plugin . '/includes/class-scfs-release-operations-admin.php');
 $board = file_get_contents($plugin . '/includes/class-scfs-release-board.php');
-$css = file_get_contents($plugin . '/assets/product-connection-editor-v7.8.0.css');
-$js = file_get_contents($plugin . '/assets/product-connection-editor-v7.8.0.js');
+$css = file_get_contents($plugin . '/assets/product-connection-editor-v7.8.1.css');
+$js = file_get_contents($plugin . '/assets/product-connection-editor-v7.8.1.js');
 $checks = array(
-    'runtime identity' => strpos($main, 'Version: 7.8.0') !== false && strpos($editor, "const VERSION = '7.8.0'") !== false,
+    'runtime identity' => strpos($main, 'Version: 7.8.1') !== false && strpos($editor, "const VERSION = '7.8.1'") !== false,
     'class bootstrapped' => strpos($main, "class-scfs-product-connection-editor.php") !== false && strpos($main, 'SCFS_Product_Connection_Editor::instance()') !== false,
     'activation registered' => strpos($main, 'SCFS_Product_Connection_Editor::activate()') !== false,
     'dedicated admin page' => strpos($editor, 'Product Connection Editor') !== false && strpos($editor, "const ADMIN_SLUG = 'scfs-product-connection-editor'") !== false,
@@ -33,4 +33,4 @@ foreach ($checks as $label => $passed) {
         exit(1);
     }
 }
-echo 'v7.8.0 Product Connection Editor contract passed (' . count($checks) . " checks).\n";
+echo 'v7.8.1 Product Connection Editor contract passed (' . count($checks) . " checks).\n";

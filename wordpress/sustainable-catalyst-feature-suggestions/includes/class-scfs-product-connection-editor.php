@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Product_Connection_Editor {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-product-connection-editor/1.0';
     const ADMIN_SLUG = 'scfs-product-connection-editor';
     const HISTORY_OPTION = 'scfs_product_connection_history';
@@ -89,8 +89,8 @@ final class SCFS_Product_Connection_Editor {
         if (strpos((string) $hook_suffix, self::ADMIN_SLUG) === false) {
             return;
         }
-        $css = 'assets/product-connection-editor-v7.8.0.css';
-        $js = 'assets/product-connection-editor-v7.8.0.js';
+        $css = 'assets/product-connection-editor-v7.8.1.css';
+        $js = 'assets/product-connection-editor-v7.8.1.js';
         $base = plugin_dir_path(dirname(__FILE__));
         wp_enqueue_style('scfs-product-connection-editor', plugins_url($css, dirname(__FILE__)), array(), is_file($base . $css) ? (string) filemtime($base . $css) : self::VERSION);
         wp_enqueue_script('scfs-product-connection-editor', plugins_url($js, dirname(__FILE__)), array(), is_file($base . $js) ? (string) filemtime($base . $js) : self::VERSION, true);

@@ -7,4 +7,4 @@ foreach (array('active_plugin_scopes','active_sitewide_plugins','activation_scop
 if (substr_count($class, "'permission_callback' => array(\$this, 'rest_permission')") !== 5) {
     fwrite(STDERR, "FAIL REST permission callback count\n"); exit(1);
 }
-echo "v7.8.0 multisite and diagnostics contract passed.\n";
+echo "v7.8.1 multisite and diagnostics contract passed.\n";

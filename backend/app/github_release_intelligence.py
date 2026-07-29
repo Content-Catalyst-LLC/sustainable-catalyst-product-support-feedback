@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-github-release-intelligence/1.0"
 
 ReleaseState = Literal["stable_release", "prerelease", "semantic_tag", "no_release"]

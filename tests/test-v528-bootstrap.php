@@ -4,8 +4,8 @@ $plugin = $root . '/wordpress/sustainable-catalyst-feature-suggestions';
 $main = file_get_contents($plugin . '/sustainable-catalyst-feature-suggestions.php');
 $class = file_get_contents($plugin . '/includes/class-scfs-support-article-integrity.php');
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'integrity class exists' => strpos($class, 'final class SCFS_Support_Article_Integrity') !== false,
     'integrity version' => strpos($class, "const VERSION = '5.2.8';") !== false,
     'integrity class required' => strpos($main, "includes/class-scfs-support-article-integrity.php") !== false,

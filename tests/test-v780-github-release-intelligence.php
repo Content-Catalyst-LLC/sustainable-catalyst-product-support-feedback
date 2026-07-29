@@ -4,12 +4,12 @@ $plugin = $root . '/wordpress/sustainable-catalyst-feature-suggestions';
 $main = file_get_contents($plugin . '/sustainable-catalyst-feature-suggestions.php');
 $sync = file_get_contents($plugin . '/includes/class-scfs-canonical-product-github-sync.php');
 $intelligence = file_get_contents($plugin . '/includes/class-scfs-github-release-intelligence.php');
-$js = file_get_contents($plugin . '/assets/github-release-intelligence-v7.8.0.js');
-$css = file_get_contents($plugin . '/assets/github-release-intelligence-v7.8.0.css');
+$js = file_get_contents($plugin . '/assets/github-release-intelligence-v7.8.1.js');
+$css = file_get_contents($plugin . '/assets/github-release-intelligence-v7.8.1.css');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $schema = json_decode(file_get_contents($root . '/schemas/scfs-github-release-intelligence-v1.schema.json'), true);
 $checks = array(
-    'runtime identity' => strpos($main, 'Version: 7.8.0') !== false && strpos($intelligence, "const VERSION = '7.8.0';") !== false,
+    'runtime identity' => strpos($main, 'Version: 7.8.1') !== false && strpos($intelligence, "const VERSION = '7.8.1';") !== false,
     'bootstrap integration' => strpos($main, "class-scfs-github-release-intelligence.php") !== false && strpos($main, 'SCFS_GitHub_Release_Intelligence::instance();') !== false,
     'repository metadata' => strpos($intelligence, 'repository_visibility') !== false && strpos($intelligence, 'repository_archived') !== false && strpos($intelligence, 'repository_disabled') !== false,
     'rename transfer detection' => strpos($intelligence, 'repository_identity_changed') !== false && strpos($intelligence, 'previous_repository_url') !== false,
@@ -27,10 +27,10 @@ $checks = array(
     'manual webhook test' => strpos($intelligence, 'manual_webhook_test_action') !== false,
     'searchable admin' => strpos($js, 'data-scfs-gri-search') !== false && strpos($intelligence, 'data-scfs-gri-row') !== false,
     'responsive accessible css' => strpos($css, '@media (max-width: 782px)') !== false && strpos($css, 'prefers-reduced-motion') !== false,
-    'schema identity' => ($schema['properties']['version']['const'] ?? '') === '7.8.0' && ($schema['properties']['schema']['const'] ?? '') === 'scfs-github-release-intelligence/1.0',
+    'schema identity' => ($schema['properties']['version']['const'] ?? '') === '7.8.1' && ($schema['properties']['schema']['const'] ?? '') === 'scfs-github-release-intelligence/1.0',
     'manifest capability' => !empty($manifest['github_release_intelligence']['release_asset_inventory']) && !empty($manifest['github_release_intelligence']['duplicate_webhook_protection']) && empty($manifest['github_release_intelligence']['automatic_publication']),
 );
 foreach ($checks as $label => $passed) {
     if (!$passed) { fwrite(STDERR, "FAIL - {$label}\n"); exit(1); }
 }
-echo 'v7.8.0 GitHub Release Intelligence source contract passed (' . count($checks) . " checks).\n";
+echo 'v7.8.1 Private Repository Release Bridge source contract passed (' . count($checks) . " checks).\n";

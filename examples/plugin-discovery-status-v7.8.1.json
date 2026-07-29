@@ -1,0 +1,48 @@
+{
+  "schema": "scfs-installed-plugin-discovery/1.0",
+  "version": "7.8.1",
+  "pending_candidate_count": 1,
+  "unmatched_candidate_count": 1,
+  "duplicate_candidate_count": 0,
+  "ignored_candidate_count": 0,
+  "manual_mapping_count": 1,
+  "status_message": "Pending private review",
+  "pending_heading_visible": true,
+  "actionable_candidate_rows": true,
+  "mapping_control": {
+    "label": "Map to canonical product",
+    "default_option": "Leave awaiting review",
+    "special_options": [
+      "Not a Sustainable Catalyst product"
+    ],
+    "save_label": "Save mapping decision"
+  },
+  "manual_mapping": {
+    "plugin_file": "sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php",
+    "product_id": "product-support-feedback",
+    "strategy": "administrator_mapping",
+    "aliases_persisted": true,
+    "installed_plugin_folder_preserved": true
+  },
+  "live_refresh": {
+    "rest_endpoint": "/product-registry/discovery/decision",
+    "summary_fragment": true,
+    "matches_fragment": true,
+    "review_fragment": true,
+    "ignored_fragment": true,
+    "non_javascript_form_fallback": true
+  },
+  "zero_state_message": "No plugins awaiting review",
+  "stale_status_reconciled": true,
+  "standard_plugin_count": 1,
+  "site_active_plugin_count": 1,
+  "network_active_plugin_count": 0,
+  "both_active_plugin_count": 0,
+  "inactive_plugin_count": 0,
+  "must_use_plugin_count": 1,
+  "dropin_count": 1,
+  "update_available_count": 1,
+  "ahead_of_release_count": 0,
+  "unknown_version_count": 2,
+  "inventory": []
+}

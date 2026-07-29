@@ -80,4 +80,4 @@ $recovery_checks = array(
     'clear success message' => strpos((string) ($recovered['github_sync_message'] ?? ''), 'No GitHub Release or semantic version tag') !== false,
 );
 foreach ($recovery_checks as $label => $passed) { if (!$passed) { fwrite(STDERR, "FAIL {$label}\n"); exit(1); } }
-echo 'v7.8.0 GitHub diagnostics and stale-error recovery runtime passed (' . (count($failure_checks) + count($recovery_checks)) . " checks).\n";
+echo 'v7.8.1 GitHub diagnostics and stale-error recovery runtime passed (' . (count($failure_checks) + count($recovery_checks)) . " checks).\n";

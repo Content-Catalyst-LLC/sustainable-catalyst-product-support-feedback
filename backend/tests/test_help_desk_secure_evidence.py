@@ -41,7 +41,7 @@ def clean_attachment(**updates):
 
 def test_intake_requires_delegated_storage_and_consent():
     result = evaluate_evidence_intake(EvidenceIntakeEvidence(case_id=10, purpose="troubleshooting"))
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
     assert result.state == "consent_required"
     assert result.delegated_storage_required is True
     assert result.media_library_storage_allowed is False
@@ -108,7 +108,7 @@ def test_retention_deletion_respects_legal_hold_and_human_review():
 
 
 def test_report_integrity():
-    payload = {"version": "7.8.0", "case": "SC-2026-000201", "attachments": 2}
+    payload = {"version": "7.8.1", "case": "SC-2026-000201", "attachments": 2}
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     checksum = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     result = verify_secure_evidence_report(SecureEvidenceReportEvidence(payload=payload, checksum=checksum))
@@ -119,7 +119,7 @@ def test_capabilities_endpoint():
     response = TestClient(app).get("/v1/help-desk/evidence/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-help-desk-secure-evidence/1.0"
     assert data["attachment_authority"] == "contact-engagement"
     assert data["uploaded_files_stored_in_media_library"] is False

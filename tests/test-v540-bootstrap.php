@@ -3,8 +3,8 @@ $root = dirname(__DIR__);
 $main = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php');
 $class = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/includes/class-scfs-known-issue-release-intelligence.php');
 $checks = array(
-    'plugin header version' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin header version' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'intelligence class required' => strpos($main, 'class-scfs-known-issue-release-intelligence.php') !== false,
     'intelligence class initialized' => strpos($main, 'SCFS_Known_Issue_Release_Intelligence::instance();') !== false,
     'activation hook retained' => strpos($main, 'SCFS_Known_Issue_Release_Intelligence::activate();') !== false,

@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Canonical_Product_GitHub_Sync {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-canonical-product-github-sync/1.0';
     const CRON_HOOK = 'scfs_canonical_product_github_sync';
     const AUDIT_OPTION = 'scfs_canonical_product_github_sync_audit';
@@ -166,9 +166,9 @@ final class SCFS_Canonical_Product_GitHub_Sync {
         );
     }
 
-    private function github_token() {
+    private function github_token($force_refresh = false) {
         if (class_exists('SCFS_GitHub_Connection_Settings')) {
-            return SCFS_GitHub_Connection_Settings::instance()->token();
+            return SCFS_GitHub_Connection_Settings::instance()->authorization_token($force_refresh);
         }
         if (defined('SCFS_GITHUB_TOKEN') && SCFS_GITHUB_TOKEN) {
             return trim((string) SCFS_GITHUB_TOKEN);
@@ -188,13 +188,20 @@ final class SCFS_Canonical_Product_GitHub_Sync {
         return is_string($value) ? trim($value) : '';
     }
 
-    private function headers() {
+    private function authentication_source() {
+        return class_exists('SCFS_GitHub_Connection_Settings') ? SCFS_GitHub_Connection_Settings::instance()->authentication_source() : ($this->github_token() !== '' ? 'token' : 'none');
+    }
+
+    private function headers($force_refresh = false) {
         $headers = array(
             'Accept' => 'application/vnd.github+json',
             'User-Agent' => 'Sustainable-Catalyst-Product-Support/' . self::VERSION,
-            'X-GitHub-Api-Version' => '2022-11-28',
+            'X-GitHub-Api-Version' => '2026-03-10',
         );
-        $token = $this->github_token();
+        $token = $this->github_token($force_refresh);
+        if (is_wp_error($token)) {
+            return $token;
+        }
         if ($token !== '') {
             $headers['Authorization'] = 'Bearer ' . $token;
         }
@@ -224,12 +231,16 @@ final class SCFS_Canonical_Product_GitHub_Sync {
         return is_array($this->response_meta[$endpoint] ?? null) ? $this->response_meta[$endpoint] : array();
     }
 
-    private function request($url, $endpoint = 'github') {
+    private function request($url, $endpoint = 'github', $retry_authentication = true) {
         $endpoint = sanitize_key($endpoint);
+        $headers = $this->headers(false);
+        if (is_wp_error($headers)) {
+            return $headers;
+        }
         $response = wp_remote_get($url, array(
             'timeout' => 15,
             'redirection' => 3,
-            'headers' => $this->headers(),
+            'headers' => $headers,
         ));
         if (is_wp_error($response)) {
             return new WP_Error(
@@ -252,8 +263,13 @@ final class SCFS_Canonical_Product_GitHub_Sync {
         $headers = $this->response_header_map($response);
         $remaining = sanitize_text_field($headers['x-ratelimit-remaining'] ?? '');
         $reset = sanitize_text_field($headers['x-ratelimit-reset'] ?? '');
+        if ($code === 401 && $retry_authentication && strpos($this->authentication_source(), 'github_app_') === 0 && class_exists('SCFS_GitHub_Connection_Settings')) {
+            SCFS_GitHub_Connection_Settings::instance()->invalidate_installation_token();
+            return $this->request($url, $endpoint, false);
+        }
         $this->response_meta[$endpoint] = array(
             'status' => $code,
+            'authentication_source' => sanitize_key($this->authentication_source()),
             'endpoint_url' => esc_url_raw($url),
             'rate_limit_remaining' => $remaining,
             'rate_limit_limit' => sanitize_text_field($headers['x-ratelimit-limit'] ?? ''),
@@ -547,6 +563,9 @@ final class SCFS_Canonical_Product_GitHub_Sync {
         $previous = trim((string) ($record['github_latest_version'] ?? ''));
 
         $record['github_repository_url'] = $repository['canonical_url'];
+        $record['github_repository_private'] = !empty($metadata['private']) ? '1' : '';
+        $record['github_repository_visibility'] = sanitize_key($metadata['visibility'] ?? (!empty($metadata['private']) ? 'private' : 'public'));
+        $record['github_authentication_source'] = sanitize_key($this->authentication_source());
         $record['repository_slug'] = sanitize_key($repository['repository']);
         $record['github_default_branch'] = $branch ?: 'main';
         $record['github_sync_state'] = 'current';

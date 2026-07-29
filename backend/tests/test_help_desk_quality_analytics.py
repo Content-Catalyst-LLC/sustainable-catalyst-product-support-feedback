@@ -22,7 +22,7 @@ from app.main import app
 
 def test_operational_metrics_score_and_governance():
     result = evaluate_operational_metrics(OperationalMetricsEvidence(total_cases=100, active_cases=20, resolved_cases=60, reopened_cases=5, escalated_cases=7, sla_completed=50, sla_met=47, oldest_active_hours=48, documentation_assisted_resolutions=35, cohort_size=100))
-    assert result.version == '7.8.0'
+    assert result.version == '7.8.1'
     assert result.schema_ == 'scfs-help-desk-quality-analytics/1.0'
     assert result.state in {'healthy', 'watch'}
     assert result.score > 70
@@ -89,7 +89,7 @@ def test_privacy_aggregate_blocks_identity_and_private_content():
 
 
 def test_report_integrity():
-    payload = {'records':[{'metric':'sla_compliance','value':92.5}], 'version':'7.8.0'}
+    payload = {'records':[{'metric':'sla_compliance','value':92.5}], 'version':'7.8.1'}
     normalized = json.dumps(payload, sort_keys=True, separators=(',',':'), ensure_ascii=True)
     result = verify_quality_analytics_report(QualityAnalyticsReportEvidence(payload=payload, sha256=sha256(normalized.encode()).hexdigest()))
     assert result.valid is True
@@ -98,7 +98,7 @@ def test_report_integrity():
 
 def test_capabilities_endpoint():
     data = TestClient(app).get('/v1/help-desk/quality-analytics/capabilities').json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['schema'] == 'scfs-help-desk-quality-analytics/1.0'
     assert data['minimum_cohort_suppression'] is True
     assert data['automatic_personnel_ranking'] is False

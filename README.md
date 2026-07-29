@@ -1,12 +1,12 @@
-## Current release: v7.8.0 — GitHub Release Intelligence
+## Current release: v7.8.1 — GitHub Release Intelligence
 
 **GitHub Release Intelligence** adds governed release and prerelease authority, semantic-tag fallback, repository and release asset evidence, rate-limit and token-scope diagnostics, synchronization history, configurable polling, and webhook replay protection.
 
-See `docs/github-release-intelligence-v7.8.0.md`.
+See `docs/github-release-intelligence-v7.8.1.md`.
 
 # Sustainable Catalyst Product Support and Feedback Platform
 
-**Current release: v7.8.0 — GitHub Release Intelligence**
+**Current release: v7.8.1 — GitHub Release Intelligence**
 
 ## Primary public shortcodes
 

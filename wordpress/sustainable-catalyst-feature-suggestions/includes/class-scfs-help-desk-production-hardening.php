@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Production_Hardening {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const DB_VERSION = '3.0.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_production_hardening_db_version';
     const SETTINGS_OPTION = 'scfs_help_desk_production_hardening_settings';

@@ -108,7 +108,7 @@ def test_capabilities_endpoint_preserves_human_authority():
     response = client.get("/v1/issue-release-intelligence/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-known-issue-release-intelligence/1.0"
     assert data["automatic_incident_declaration"] is False
     assert data["automatic_release_status_changes"] is False

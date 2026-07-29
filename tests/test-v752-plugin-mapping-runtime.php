@@ -20,7 +20,7 @@ $GLOBALS['scfs_transients'] = array();
 $GLOBALS['scfs_plugins'] = array(
     'sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php' => array(
         'Name' => 'Sustainable Catalyst Product Support and Feedback Platform',
-        'Version' => '7.8.0',
+        'Version' => '7.8.1',
         'AuthorName' => 'Content Catalyst LLC',
         'TextDomain' => 'sustainable-catalyst-feature-suggestions',
     ),
@@ -93,4 +93,4 @@ $result = $method->invoke($discovery, 'catalyst-unknown/catalyst-unknown.php', '
 if (is_wp_error($result) || count($discovery->manual_mappings()) !== 0) { fwrite(STDERR, "FAIL remove mapping\n"); exit(1); }
 $canvas = SCFS_Canonical_Product_Registry::instance()->get_product('catalyst-canvas');
 if (($canvas['plugin_file'] ?? '') === 'catalyst-unknown/catalyst-unknown.php' || in_array('catalyst-unknown/catalyst-unknown.php', $canvas['legacy_plugin_files'], true)) { fwrite(STDERR, "FAIL identifier rollback\n"); exit(1); }
-echo "v7.8.0 plugin mapping runtime simulation passed.\n";
+echo "v7.8.1 plugin mapping runtime simulation passed.\n";

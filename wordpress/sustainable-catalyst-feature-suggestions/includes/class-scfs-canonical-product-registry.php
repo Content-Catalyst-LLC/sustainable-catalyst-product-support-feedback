@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Canonical_Product_Registry {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-canonical-product-registry/2.1';
     const OPTION_KEY = 'scfs_canonical_product_registry';
     const SCHEMA_OPTION = 'scfs_canonical_product_registry_schema';
@@ -237,6 +237,9 @@ final class SCFS_Canonical_Product_Registry {
             'product_description' => '',
             'repository_slug' => '',
             'github_repository_url' => '',
+            'github_repository_private' => '',
+            'github_repository_visibility' => '',
+            'github_authentication_source' => '',
             'github_default_branch' => 'main',
             'github_sync_enabled' => '1',
             'github_sync_locked' => '',
@@ -582,6 +585,9 @@ final class SCFS_Canonical_Product_Registry {
             'product_description' => sanitize_textarea_field(isset($record['product_description']) ? $record['product_description'] : ''),
             'repository_slug' => sanitize_key(isset($record['repository_slug']) ? $record['repository_slug'] : ''),
             'github_repository_url' => esc_url_raw(isset($record['github_repository_url']) ? $record['github_repository_url'] : ''),
+            'github_repository_private' => !empty($record['github_repository_private']) ? '1' : '',
+            'github_repository_visibility' => sanitize_key(isset($record['github_repository_visibility']) ? $record['github_repository_visibility'] : ''),
+            'github_authentication_source' => sanitize_key(isset($record['github_authentication_source']) ? $record['github_authentication_source'] : ''),
             'github_default_branch' => sanitize_text_field(isset($record['github_default_branch']) && $record['github_default_branch'] !== '' ? $record['github_default_branch'] : 'main'),
             'github_sync_enabled' => !empty($record['github_sync_enabled']) ? '1' : '',
             'github_sync_locked' => !empty($record['github_sync_locked']) ? '1' : '',
@@ -875,6 +881,8 @@ final class SCFS_Canonical_Product_Registry {
     }
 
     private function public_record($record) {
+        $repository_visibility = sanitize_key($record['github_repository_visibility'] ?? '');
+        $private_repository = !empty($record['github_repository_private']) || $repository_visibility !== 'public';
         return array(
             'canonical_id' => $record['canonical_id'],
             'name' => $record['name'],
@@ -895,13 +903,13 @@ final class SCFS_Canonical_Product_Registry {
             'product_url' => $record['product_url'],
             'documentation_url' => $record['documentation_url'],
             'support_url' => $record['support_url'],
-            'release_notes_url' => $record['release_notes_url'],
-            'github_repository_url' => $record['github_repository_url'],
-            'github_latest_release_url' => $record['github_latest_release_url'],
+            'release_notes_url' => $private_repository ? '' : $record['release_notes_url'],
+            'github_repository_url' => $private_repository ? '' : $record['github_repository_url'],
+            'github_latest_release_url' => $private_repository ? '' : $record['github_latest_release_url'],
             'github_latest_tag_name' => $record['github_latest_tag_name'],
-            'github_latest_tag_url' => $record['github_latest_tag_url'],
+            'github_latest_tag_url' => $private_repository ? '' : $record['github_latest_tag_url'],
             'github_version_source' => $record['github_version_source'],
-            'github_latest_commit_sha' => $record['github_latest_commit_sha'],
+            'github_latest_commit_sha' => $private_repository ? '' : $record['github_latest_commit_sha'],
             'github_repository_updated_at' => $record['github_repository_updated_at'],
             'github_sync_state' => $record['github_sync_state'],
             'github_last_synced_at' => $record['github_last_synced_at'],
@@ -972,7 +980,7 @@ final class SCFS_Canonical_Product_Registry {
             'public_visibility_governed' => true,
             'homepage_visibility_governed' => true,
             'private_repository_fields_publicly_exposed' => false,
-            'private_fields' => array('internal_name', 'repository_slug', 'plugin_file', 'plugin_slug', 'plugin_text_domain', 'manual_notes'),
+            'private_fields' => array('internal_name', 'repository_slug', 'plugin_file', 'plugin_slug', 'plugin_text_domain', 'manual_notes', 'github_repository_url', 'github_latest_release_url', 'github_latest_tag_url', 'github_latest_commit_sha', 'github_authentication_source'),
             'automatic_publication' => false,
             'human_review_required' => true,
             'installed_plugin_discovery' => true,
@@ -1053,7 +1061,7 @@ final class SCFS_Canonical_Product_Registry {
         $summary = $this->summary_record();
         $integrity = $this->integrity_report($registry);
         echo '<div class="wrap"><h1>' . esc_html__('Canonical Product Registry', 'sustainable-catalyst-feature-suggestions') . '</h1>';
-        echo '<p>' . esc_html__('This registry is the governed source of product identity for release boards, support documentation, release records, and future product discovery. v7.8.0 adds governed catalog administration with search, lifecycle controls, drag-and-drop console ordering, duplicate merges, alias collision review, archive and restore, dry-run import, automatic backups, and administrator-attributed history.', 'sustainable-catalyst-feature-suggestions') . '</p>';
+        echo '<p>' . esc_html__('This registry is the governed source of product identity for release boards, support documentation, release records, and future product discovery. v7.8.1 adds governed catalog administration with search, lifecycle controls, drag-and-drop console ordering, duplicate merges, alias collision review, archive and restore, dry-run import, automatic backups, and administrator-attributed history.', 'sustainable-catalyst-feature-suggestions') . '</p>';
         if (isset($_GET['updated'])) {
             echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Product registry saved.', 'sustainable-catalyst-feature-suggestions') . '</p></div>';
         }
@@ -1099,7 +1107,7 @@ final class SCFS_Canonical_Product_Registry {
             echo '</td></tr>';
             echo '<tr><th>' . esc_html__('Plugin slug', 'sustainable-catalyst-feature-suggestions') . '</th><td><input class="regular-text" name="' . esc_attr($field . '[plugin_slug]') . '" value="' . esc_attr($record['plugin_slug']) . '"></td><th>' . esc_html__('Plugin file', 'sustainable-catalyst-feature-suggestions') . '</th><td><input class="regular-text" name="' . esc_attr($field . '[plugin_file]') . '" value="' . esc_attr($record['plugin_file']) . '"></td></tr>';
             echo '<tr><th>' . esc_html__('GitHub repository', 'sustainable-catalyst-feature-suggestions') . '</th><td><input class="regular-text code" type="url" name="' . esc_attr($field . '[github_repository_url]') . '" value="' . esc_attr($record['github_repository_url']) . '" placeholder="https://github.com/owner/repository"></td><th>' . esc_html__('Default branch', 'sustainable-catalyst-feature-suggestions') . '</th><td><input name="' . esc_attr($field . '[github_default_branch]') . '" value="' . esc_attr($record['github_default_branch']) . '"></td></tr>';
-            echo '<tr><th>' . esc_html__('GitHub synchronization', 'sustainable-catalyst-feature-suggestions') . '</th><td colspan="3"><label style="margin-right:18px"><input type="checkbox" name="' . esc_attr($field . '[github_sync_enabled]') . '" value="1" ' . checked(!empty($record['github_sync_enabled']), true, false) . '> ' . esc_html__('Update the Release Console from GitHub releases', 'sustainable-catalyst-feature-suggestions') . '</label><label><input type="checkbox" name="' . esc_attr($field . '[github_sync_locked]') . '" value="1" ' . checked(!empty($record['github_sync_locked']), true, false) . '> ' . esc_html__('Keep GitHub evidence but do not replace public release fields', 'sustainable-catalyst-feature-suggestions') . '</label><p class="description">' . esc_html__('Signed webhooks update immediately; hourly polling provides a fallback. Optional private-repository access uses SCFS_GITHUB_TOKEN.', 'sustainable-catalyst-feature-suggestions') . '</p></td></tr>';
+            echo '<tr><th>' . esc_html__('GitHub synchronization', 'sustainable-catalyst-feature-suggestions') . '</th><td colspan="3"><label style="margin-right:18px"><input type="checkbox" name="' . esc_attr($field . '[github_sync_enabled]') . '" value="1" ' . checked(!empty($record['github_sync_enabled']), true, false) . '> ' . esc_html__('Update the Release Console from GitHub releases', 'sustainable-catalyst-feature-suggestions') . '</label><label><input type="checkbox" name="' . esc_attr($field . '[github_sync_locked]') . '" value="1" ' . checked(!empty($record['github_sync_locked']), true, false) . '> ' . esc_html__('Keep GitHub evidence but do not replace public release fields', 'sustainable-catalyst-feature-suggestions') . '</label><p class="description">' . esc_html__('Signed webhooks update immediately; hourly polling provides a fallback. Private repositories use the GitHub App bridge when configured; SCFS_GITHUB_TOKEN remains an optional fallback.', 'sustainable-catalyst-feature-suggestions') . '</p></td></tr>';
             echo '<tr><th>' . esc_html__('GitHub state', 'sustainable-catalyst-feature-suggestions') . '</th><td><code>' . esc_html($record['github_sync_state']) . '</code> ' . esc_html($record['github_latest_version']) . '</td><th>' . esc_html__('Last GitHub sync', 'sustainable-catalyst-feature-suggestions') . '</th><td><code>' . esc_html($record['github_last_synced_at'] ?: __('Never', 'sustainable-catalyst-feature-suggestions')) . '</code></td></tr>';
             echo '<tr><th>' . esc_html__('Plugin text domain', 'sustainable-catalyst-feature-suggestions') . '</th><td><input class="regular-text" name="' . esc_attr($field . '[plugin_text_domain]') . '" value="' . esc_attr($record['plugin_text_domain']) . '"></td><th>' . esc_html__('Discovery state', 'sustainable-catalyst-feature-suggestions') . '</th><td><code>' . esc_html($record['discovery_state']) . '</code> ' . esc_html($record['discovered_plugin_version']) . '</td></tr>';
             echo '<tr><th>' . esc_html__('Plugin discovery', 'sustainable-catalyst-feature-suggestions') . '</th><td colspan="3"><label style="margin-right:18px"><input type="checkbox" name="' . esc_attr($field . '[discovery_enabled]') . '" value="1" ' . checked(!empty($record['discovery_enabled']), true, false) . '> ' . esc_html__('Allow automatic installed-version detection', 'sustainable-catalyst-feature-suggestions') . '</label><label><input type="checkbox" name="' . esc_attr($field . '[discovery_locked]') . '" value="1" ' . checked(!empty($record['discovery_locked']), true, false) . '> ' . esc_html__('Lock version and status overrides', 'sustainable-catalyst-feature-suggestions') . '</label><p class="description">' . esc_html__('A lock keeps the discovery evidence current without replacing the configured installed version, public version, or status.', 'sustainable-catalyst-feature-suggestions') . '</p></td></tr>';
@@ -1137,7 +1145,7 @@ final class SCFS_Canonical_Product_Registry {
         echo '<hr><p><a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=scfs_validate_product_registry'), 'scfs_validate_product_registry')) . '">' . esc_html__('Validate integrity', 'sustainable-catalyst-feature-suggestions') . '</a> ';
         echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=scfs_migrate_product_registry'), 'scfs_migrate_product_registry')) . '">' . esc_html__('Run schema migration', 'sustainable-catalyst-feature-suggestions') . '</a> ';
         echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=scfs_export_product_registry'), 'scfs_export_product_registry')) . '">' . esc_html__('Export registry JSON', 'sustainable-catalyst-feature-suggestions') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=scfs_reset_product_registry'), 'scfs_reset_product_registry')) . '" onclick="return confirm(\'' . esc_js(__('Reset the product registry to the v7.8.0 defaults?', 'sustainable-catalyst-feature-suggestions')) . '\')">' . esc_html__('Reset defaults', 'sustainable-catalyst-feature-suggestions') . '</a></p>';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=scfs_reset_product_registry'), 'scfs_reset_product_registry')) . '" onclick="return confirm(\'' . esc_js(__('Reset the product registry to the v7.8.1 defaults?', 'sustainable-catalyst-feature-suggestions')) . '\')">' . esc_html__('Reset defaults', 'sustainable-catalyst-feature-suggestions') . '</a></p>';
         echo '</div>';
     }
 
@@ -1282,12 +1290,13 @@ final class SCFS_Canonical_Product_Registry {
     }
 
     public function rest_registry() {
+        $administrator = current_user_can('manage_options');
         return rest_ensure_response(array(
             'ok' => true,
             'summary' => $this->summary_record(),
-            'integrity' => $this->integrity_report(),
-            'migration_history' => array_values((array) get_option(self::MIGRATION_OPTION, array())),
-            'products' => array_values($this->registry()),
+            'integrity' => $administrator ? $this->integrity_report() : array(),
+            'migration_history' => $administrator ? array_values((array) get_option(self::MIGRATION_OPTION, array())) : array(),
+            'products' => array_values($administrator ? $this->registry() : $this->public_products(false)),
         ));
     }
 
@@ -1305,8 +1314,16 @@ final class SCFS_Canonical_Product_Registry {
 
     public function rest_product($request) {
         $record = $this->get_product($request['product_id']);
-        if (!$record) {
+        if (!$record || (!current_user_can('manage_options') && (empty($record['public_visible']) || !empty($record['archived'])))) {
             return new WP_Error('scfs_product_not_found', __('Product not found.', 'sustainable-catalyst-feature-suggestions'), array('status' => 404));
+        }
+        if (!current_user_can('manage_options')) {
+            foreach ($this->public_products(false) as $public_record) {
+                if (($public_record['canonical_id'] ?? '') === ($record['canonical_id'] ?? '')) {
+                    $record = $public_record;
+                    break;
+                }
+            }
         }
         return rest_ensure_response(array('ok' => true, 'product' => $record));
     }

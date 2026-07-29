@@ -13,7 +13,7 @@ function __($text) { return $text; }
 require dirname(__DIR__) . '/wordpress/sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php';
 $checks = array(
     'main class loaded' => class_exists('Sustainable_Catalyst_Feature_Suggestions'),
-    'version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.0',
+    'version is 5.1.0' => Sustainable_Catalyst_Feature_Suggestions::VERSION === '7.8.1',
     'product integration loaded' => class_exists('SCFS_Product_Integration'),
     'knowledge base loaded' => class_exists('SCFS_Knowledge_Base_Foundation'),
     'guided resolution loaded' => class_exists('SCFS_Guided_Resolution'),

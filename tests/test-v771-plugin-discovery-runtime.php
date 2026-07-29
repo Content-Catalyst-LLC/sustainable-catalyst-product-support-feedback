@@ -49,7 +49,7 @@ SCFS_Canonical_Product_Registry::activate();
 $registry = SCFS_Canonical_Product_Registry::instance()->registry();
 $registry['product-support-feedback']['plugin_file'] = 'support/support.php';
 $registry['product-support-feedback']['github_repository_url'] = 'https://github.com/Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback';
-$registry['product-support-feedback']['github_latest_version'] = '7.8.0';
+$registry['product-support-feedback']['github_latest_version'] = '7.8.1';
 update_option(SCFS_Canonical_Product_Registry::OPTION_KEY, SCFS_Canonical_Product_Registry::instance()->normalize_registry($registry));
 SCFS_Installed_Plugin_Discovery::activate();
 $discovery = SCFS_Installed_Plugin_Discovery::instance();
@@ -66,9 +66,9 @@ $checks = array(
 );
 $reflection = new ReflectionMethod($discovery, 'compare_plugin_versions');
 $reflection->setAccessible(true);
-$checks['ahead comparison'] = $reflection->invoke($discovery, '8.0.0', '7.8.0') === 'ahead';
-$checks['current comparison'] = $reflection->invoke($discovery, '7.8.0', '7.8.0') === 'current';
+$checks['ahead comparison'] = $reflection->invoke($discovery, '8.0.0', '7.8.1') === 'ahead';
+$checks['current comparison'] = $reflection->invoke($discovery, '7.8.1', '7.8.1') === 'current';
 foreach ($checks as $label => $passed) { if (!$passed) { fwrite(STDERR, "FAIL - {$label}
 "); exit(1); } }
-echo "v7.8.0 GitHub Release Intelligence runtime contract passed (" . count($checks) . " checks).
+echo "v7.8.1 Private Repository Release Bridge runtime contract passed (" . count($checks) . " checks).
 ";

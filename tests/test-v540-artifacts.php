@@ -5,8 +5,8 @@ $release = json_decode(file_get_contents($root . '/release-manifest-v5.4.0.json'
 $schema = json_decode(file_get_contents($root . '/schemas/scfs-known-issue-release-intelligence-v1.schema.json'), true);
 $example = json_decode(file_get_contents($root . '/examples/issue-release-intelligence-v5.4.0.json'), true);
 $checks = array(
-    'feature manifest version' => ($manifest['version'] ?? '') === '7.8.0',
-    'feature manifest release name' => ($manifest['release_name'] ?? '') === 'GitHub Release Intelligence',
+    'feature manifest version' => ($manifest['version'] ?? '') === '7.8.1',
+    'feature manifest release name' => ($manifest['release_name'] ?? '') === 'Private Repository Release Bridge',
     'feature manifest intelligence contract' => ($manifest['issue_release_intelligence']['schema'] ?? '') === 'scfs-known-issue-release-intelligence/1.0',
     'release manifest version' => ($release['version'] ?? '') === '5.4.0',
     'release manifest compatibility' => ($release['compatibility']['database_migration_required'] ?? true) === false,

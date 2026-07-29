@@ -35,7 +35,7 @@ def candidates():
 
 def test_resolution_ranks_public_guidance_and_requires_review():
     result = evaluate_resolution(case(), candidates())
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
     assert result.schema_ == "scfs-help-desk-knowledge-resolution/1.0"
     assert result.recommendations[0].score >= result.recommendations[-1].score
     assert all(item.requires_agent_approval for item in result.recommendations)
@@ -86,7 +86,7 @@ def test_guided_plan_never_executes_automatically():
 
 
 def test_report_integrity():
-    payload = {"version": "7.8.0", "case": "SC-2026-000301", "recommendations": 3}
+    payload = {"version": "7.8.1", "case": "SC-2026-000301", "recommendations": 3}
     normalized = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     digest = sha256(normalized.encode()).hexdigest()
     result = verify_knowledge_resolution_report(KnowledgeResolutionReportEvidence(payload=payload, sha256=digest))
@@ -95,7 +95,7 @@ def test_report_integrity():
 
 def test_capabilities_endpoint():
     data = TestClient(app).get('/v1/help-desk/knowledge-resolution/capabilities').json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['schema'] == 'scfs-help-desk-knowledge-resolution/1.0'
     assert data['automatic_customer_send'] is False
     assert data['automatic_duplicate_merge'] is False

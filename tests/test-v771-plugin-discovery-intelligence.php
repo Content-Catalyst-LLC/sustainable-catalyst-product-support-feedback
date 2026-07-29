@@ -2,11 +2,11 @@
 $root = dirname(__DIR__);
 $plugin = $root . '/wordpress/sustainable-catalyst-feature-suggestions';
 $class = file_get_contents($plugin . '/includes/class-scfs-installed-plugin-discovery.php');
-$js = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.0.js');
-$css = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.0.css');
+$js = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.1.js');
+$css = file_get_contents($plugin . '/assets/plugin-discovery-v7.8.1.css');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'runtime version' => strpos($class, "const VERSION = '7.8.0';") !== false,
+    'runtime version' => strpos($class, "const VERSION = '7.8.1';") !== false,
     'complete inventory' => strpos($class, 'Complete plugin inventory') !== false && strpos($class, 'plugin_inventory()') !== false,
     'standard plugins' => strpos($class, "'standard'") !== false && strpos($class, 'get_plugins()') !== false,
     'must use plugins' => strpos($class, 'get_mu_plugins()') !== false && strpos($class, "'must-use'") !== false,
@@ -29,5 +29,5 @@ foreach ($checks as $label => $passed) {
     if (!$passed) { fwrite(STDERR, "FAIL - {$label}
 "); exit(1); }
 }
-echo "v7.8.0 GitHub Release Intelligence source contract passed (" . count($checks) . " checks).
+echo "v7.8.1 Private Repository Release Bridge source contract passed (" . count($checks) . " checks).
 ";

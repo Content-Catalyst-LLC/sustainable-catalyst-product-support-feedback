@@ -3,8 +3,8 @@ $root = dirname(__DIR__);
 $main = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php');
 $class = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/includes/class-scfs-support-analytics-documentation-effectiveness.php');
 $checks = array(
-    'plugin header version' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin header version' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'analytics class required' => strpos($main, 'class-scfs-support-analytics-documentation-effectiveness.php') !== false,
     'analytics class initialized' => strpos($main, 'SCFS_Support_Analytics_Documentation_Effectiveness::instance();') !== false,
     'activation hook' => strpos($main, 'SCFS_Support_Analytics_Documentation_Effectiveness::activate();') !== false,

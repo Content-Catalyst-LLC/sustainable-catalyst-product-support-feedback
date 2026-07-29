@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Help_Desk_Workflow_Automation {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-help-desk-workflow-automation/1.0';
     const DB_VERSION = '1.6.0';
     const DB_VERSION_OPTION = 'scfs_help_desk_workflow_automation_db_version';

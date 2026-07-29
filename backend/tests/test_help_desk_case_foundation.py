@@ -21,7 +21,7 @@ def test_case_number_generation_is_deterministic():
     result = generate_case_number(CaseNumberRequest(sequence=184, year=2026, prefix="SC"))
     assert result.case_number == "SC-2026-000184"
     assert result.schema_id == "scfs-help-desk-case/1.0"
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
 
 
 def test_case_intake_accepts_governed_private_reference():

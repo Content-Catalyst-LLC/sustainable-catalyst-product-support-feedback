@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Release_Console_Copy {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-release-console-copy/1.0';
     const OPTION_KEY = 'scfs_release_console_copy';
     const ADMIN_SLUG = 'scfs-release-console-copy';

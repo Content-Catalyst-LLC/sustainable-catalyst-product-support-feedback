@@ -179,7 +179,7 @@ def test_capabilities_endpoint():
     response = client.get('/v1/help-desk/institutional-workspaces/capabilities')
     assert response.status_code == 200
     body = response.json()
-    assert body['version'] == '7.8.0'
+    assert body['version'] == '7.8.1'
     assert body['schema'] == 'scfs-help-desk-institutional-workspaces/1.0'
     assert body['public_institutional_branding'] is False
     assert body['sponsor_influence'] is False

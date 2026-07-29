@@ -28,7 +28,7 @@ def test_capabilities_preserve_public_private_boundary():
     response = client.get("/v1/cross-product/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["automatic_incident_declaration"] is False
     assert data["private_case_content_storage"] is False
 

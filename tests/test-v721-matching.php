@@ -7,4 +7,4 @@ foreach (array('legacy_plugin_file','legacy_plugin_slug','legacy_text_domain','c
 foreach (array('version_normalization','normalize_version','development_version_detected','plugin_version_missing','plugin_version_malformed','malformed_header') as $needle) {
     if (strpos($class, $needle) === false) { fwrite(STDERR, "FAIL version compatibility: {$needle}\n"); exit(1); }
 }
-echo "v7.8.0 matching and version compatibility contract passed.\n";
+echo "v7.8.1 matching and version compatibility contract passed.\n";

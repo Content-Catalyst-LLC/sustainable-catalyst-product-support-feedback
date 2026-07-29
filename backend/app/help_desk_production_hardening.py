@@ -1,4 +1,4 @@
-"""Reliability, Security, Privacy, and Production Hardening v7.8.0.
+"""Reliability, Security, Privacy, and Production Hardening v7.8.1.
 
 Deterministic production-readiness evaluators for the Sustainable Catalyst help desk.
 The module never executes destructive privacy operations, rotates credentials, restores
@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-help-desk-production-hardening/1.0"
 
 

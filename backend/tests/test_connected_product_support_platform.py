@@ -31,7 +31,7 @@ def complete_evidence() -> ConnectedPlatformEvidence:
 
 def test_connected_assessment_reaches_connected_state():
     result = evaluate_connected_platform(complete_evidence())
-    assert result.version == "7.8.0"
+    assert result.version == "7.8.1"
     assert result.state == "connected"
     assert result.score >= 95
     assert result.human_review_required is True
@@ -76,7 +76,7 @@ def test_journey_uses_private_boundary_only_as_last_resort():
 
 
 def test_connected_report_checksum():
-    payload = {"version": "7.8.0", "state": "connected", "score": 97}
+    payload = {"version": "7.8.1", "state": "connected", "score": 97}
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     checksum = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     result = verify_connected_platform_report(ConnectedPlatformReportEvidence(payload=payload, checksum=checksum))
@@ -87,7 +87,7 @@ def test_connected_platform_capabilities_endpoint():
     response = TestClient(app).get("/v1/connected-platform/capabilities")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "7.8.0"
+    assert data["version"] == "7.8.1"
     assert data["schema"] == "scfs-connected-product-support-feedback-platform/1.0"
     assert data["specialist_modules_remain_source_of_truth"] is True
 

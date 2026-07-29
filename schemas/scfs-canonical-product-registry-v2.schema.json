@@ -13,7 +13,7 @@
       "const": "scfs-canonical-product-registry/2.1"
     },
     "version": {
-      "const": "7.8.0"
+      "const": "7.8.1"
     },
     "products": {
       "type": "array",

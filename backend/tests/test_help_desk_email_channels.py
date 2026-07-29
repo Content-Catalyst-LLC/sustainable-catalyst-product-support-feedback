@@ -29,7 +29,7 @@ def digest(value: str) -> str:
 
 def test_inbound_email_matches_authoritative_case_number():
     result = evaluate_inbound_email(InboundEmailEvidence(provider_message_id='m-1', sender_ref='contact:17', subject='Re: [SC-2026-000401] Export failure', body_sha256=digest('body'), known_case_numbers=['SC-2026-000401'], authorization_valid=True))
-    assert result.version == '7.8.0'
+    assert result.version == '7.8.1'
     assert result.schema_ == 'scfs-help-desk-email-channels/1.0'
     assert result.accepted is True
     assert result.disposition == 'append_to_case'
@@ -108,12 +108,12 @@ def test_only_microsoft_teams_handoff_is_supported():
 
 
 def test_report_integrity_and_capabilities_endpoint():
-    payload={'version':'7.8.0','case':'SC-2026-000401','messages':4}
+    payload={'version':'7.8.1','case':'SC-2026-000401','messages':4}
     normalized=json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=True)
     report=verify_email_channel_report(EmailChannelReportEvidence(payload=payload,sha256=sha256(normalized.encode()).hexdigest()))
     assert report.valid is True
     data=TestClient(app).get('/v1/help-desk/channels/capabilities').json()
-    assert data['version']=='7.8.0'
+    assert data['version']=='7.8.1'
     assert data['schema']=='scfs-help-desk-email-channels/1.0'
     assert data['automatic_case_creation'] is False
     assert data['automatic_customer_send'] is False

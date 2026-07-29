@@ -15,7 +15,7 @@
       "const": "scfs-release-board/1.3"
     },
     "version": {
-      "const": "7.8.0"
+      "const": "7.8.1"
     },
     "layout": {
       "enum": [

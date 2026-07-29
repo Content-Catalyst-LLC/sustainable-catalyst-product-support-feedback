@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sustainable Catalyst Product Support and Feedback Platform
  * Description: Product support, publication-grade documentation, known issues, release intelligence, feature feedback, product-signal intelligence, documentation-effectiveness analytics, cross-product support graphs, governed platform handoffs, controlled public support APIs, product embeds, institutional support integration, private help-desk case foundations, agent workspaces, team queues, assignment operations, secure customer portals, participant conversations, satisfaction feedback, service-level policies, support calendars, governed response clocks, escalation review, secure evidence intake, controlled attachment metadata, diagnostic bundles, retention and redaction governance, knowledge-assisted case resolution, agent-reviewed support recommendations, duplicate-case review, documentation promotion, governed workflow automation, operational rules, agent macros, approval queues, follow-up scheduling, email intake, case-thread matching, governed outbound email drafts, delivery and bounce tracking, Microsoft Teams handoffs, help-desk quality assurance, operational analytics, privacy-safe support intelligence, governed quality reviews, institutional workspaces, support entitlements, private knowledge collections, explicit case access, institutional reporting, scoped help-desk APIs, signed outbound webhooks, delivery retries, dead-letter review, external system links, integration audit evidence, rate limits, abuse controls, privacy operations, backup and recovery evidence, production release gates, security health monitoring, accessibility and performance hardening, connected help-desk orchestration, end-to-end support journeys, operating dossiers, cross-module command planning, platform health snapshots, connected platform governance, surveys, editorial governance, reliability analytics, and privacy-safe support handoffs for Sustainable Catalyst.
- * Version: 7.8.0
+ * Version: 7.8.1
  * Author: Content Catalyst LLC
  * License: GPL-2.0-or-later
  * Text Domain: sustainable-catalyst-feature-suggestions
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class Sustainable_Catalyst_Feature_Suggestions {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const POST_TYPE = 'sc_feature_suggest';
     const NONCE_ACTION = 'scfs_submit_suggestion';
     const NONCE_NAME = 'scfs_nonce';

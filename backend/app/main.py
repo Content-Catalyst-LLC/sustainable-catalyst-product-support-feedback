@@ -40,7 +40,7 @@ from .installed_plugin_discovery import PluginDiscoveryAssessment, PluginDiscove
 from .release_board import ReleaseBoardProjectionRequest, ReleaseBoardProjection, release_board_capabilities, project_release_board
 from .help_desk_production_hardening import RateLimitEvidence, RateLimitAssessment, AbuseSignalEvidence, AbuseSignalAssessment, PrivacyOperationEvidence, PrivacyOperationAssessment, BackupSnapshotEvidence, BackupSnapshotAssessment, RecoveryDrillEvidence, RecoveryDrillAssessment, SecurityHeaderEvidence, SecurityHeaderAssessment, ProductionGateEvidence, ProductionGateAssessment, HardeningReportEvidence, HardeningReportResult, evaluate_rate_limit, evaluate_abuse_signal, evaluate_privacy_operation, evaluate_backup_snapshot, evaluate_recovery_drill, evaluate_security_headers, evaluate_production_gate, verify_hardening_report
 
-VERSION='7.8.0'
+VERSION='7.8.1'
 ANALYSIS_VERSION='5.1.0-1'
 from .connected_help_desk_platform import ModuleEvidence, PlatformEvidence, PlatformAssessment, JourneyEvidence, JourneyPlan, CommandEvidence, CommandPlan, DossierEvidence, DossierAssessment, ConnectedReportEvidence, ConnectedReportResult, evaluate_connected_help_desk, plan_support_journey, plan_connected_command, evaluate_case_dossier, verify_connected_report
 
@@ -1471,7 +1471,7 @@ def help_desk_channels_report(payload: EmailChannelReportEvidence, x_scfs_ai_key
 def help_desk_quality_analytics_capabilities(x_scfs_ai_key:Optional[str]=Header(default=None)):
     auth(x_scfs_ai_key)
     return {
-        'version':'7.8.0',
+        'version':'7.8.1',
         'schema':'scfs-help-desk-quality-analytics/1.0',
         'operational_metrics':True,
         'governed_case_quality_review':True,
@@ -1792,7 +1792,7 @@ def product_registry_discovery_validate(payload: PluginDiscoveryEvidence, x_scfs
 @app.get("/v1/help-desk/connected-platform/capabilities")
 def connected_help_desk_capabilities():
     return {
-        "version": "7.8.0",
+        "version": "7.8.1",
         "schema": "scfs-connected-help-desk-platform/1.0",
         "layers": ["public_support", "customer_portal", "agent_operations", "knowledge_operations", "service_management", "product_intelligence", "institutional_integration"],
         "automatic_customer_communication": False,

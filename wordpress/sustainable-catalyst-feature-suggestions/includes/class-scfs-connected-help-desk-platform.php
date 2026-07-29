@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_Connected_Help_Desk_Platform {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const DB_VERSION = '4.0.0';
     const DB_OPTION = 'scfs_connected_help_desk_platform_db_version';
     const SETTINGS_OPTION = 'scfs_connected_help_desk_platform_settings';

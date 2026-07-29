@@ -7,8 +7,8 @@ $integrated = file_get_contents($plugin . '/includes/class-scfs-integrated-knowl
 $css = file_get_contents($plugin . '/assets/knowledge-base.css');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'main version constant' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'main version constant' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'knowledge base version' => strpos($knowledge, "const VERSION = '5.4.0';") !== false,
     'integrated knowledge base version' => strpos($integrated, "const VERSION = '5.4.0';") !== false,
     'body class filter' => strpos($knowledge, "add_filter('body_class'") !== false,
@@ -20,7 +20,7 @@ $checks = array(
     'publications navigation suppression' => strpos($css, '.publications-navigation') !== false,
     'full width primary content' => strpos($css, 'body.scfs-kb-full-width #primary') !== false,
     'expanded article shell' => strpos($css, 'max-width:1180px') !== false,
-    'manifest version' => ($manifest['version'] ?? '') === '7.8.0',
+    'manifest version' => ($manifest['version'] ?? '') === '7.8.1',
     'release notes exist' => file_exists($root . '/RELEASE_NOTES_5.2.9.md'),
 );
 foreach ($checks as $label => $passed) {

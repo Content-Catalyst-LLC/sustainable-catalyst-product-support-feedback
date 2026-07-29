@@ -1,6 +1,6 @@
 <?php
 $root = dirname(__DIR__);
-$css = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/assets/release-board-v7.8.0.css');
+$css = file_get_contents($root . '/wordpress/sustainable-catalyst-feature-suggestions/assets/release-board-v7.8.1.css');
 $checks = array(
     'scoped stylesheet' => strpos($css, '.scfs-release-board') !== false,
     'terminal surface' => strpos($css, '--scfs-telemetry-bg: #07090a') !== false,
@@ -17,4 +17,4 @@ $checks = array(
 foreach ($checks as $label => $ok) {
     if (!$ok) { fwrite(STDERR, "FAIL: {$label}\n"); exit(1); }
 }
-echo "v7.8.0 release board stylesheet contract passed.\n";
+echo "v7.8.1 release board stylesheet contract passed.\n";

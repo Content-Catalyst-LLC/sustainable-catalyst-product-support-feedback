@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class SCFS_GitHub_Release_Intelligence {
-    const VERSION = '7.8.0';
+    const VERSION = '7.8.1';
     const SCHEMA = 'scfs-github-release-intelligence/1.0';
     const OPTION_KEY = 'scfs_github_release_intelligence';
     const SETTINGS_OPTION = 'scfs_github_release_intelligence_settings';
@@ -166,6 +166,7 @@ final class SCFS_GitHub_Release_Intelligence {
             }
             $output[sanitize_key($endpoint)] = array(
                 'status' => absint($meta['status'] ?? 0),
+                'authentication_source' => sanitize_key($meta['authentication_source'] ?? ''),
                 'rate_limit_remaining' => sanitize_text_field($meta['rate_limit_remaining'] ?? ''),
                 'rate_limit_limit' => sanitize_text_field($meta['rate_limit_limit'] ?? ''),
                 'rate_limit_reset' => sanitize_text_field($meta['rate_limit_reset'] ?? ''),
@@ -404,8 +405,8 @@ final class SCFS_GitHub_Release_Intelligence {
         }
         $plugin_file = dirname(__DIR__) . '/sustainable-catalyst-feature-suggestions.php';
         $base = plugin_dir_url($plugin_file) . 'assets/';
-        wp_enqueue_style('scfs-github-release-intelligence-v780', $base . 'github-release-intelligence-v7.8.0.css', array(), self::VERSION);
-        wp_enqueue_script('scfs-github-release-intelligence-v780', $base . 'github-release-intelligence-v7.8.0.js', array(), self::VERSION, true);
+        wp_enqueue_style('scfs-github-release-intelligence-v781', $base . 'github-release-intelligence-v7.8.1.css', array(), self::VERSION);
+        wp_enqueue_script('scfs-github-release-intelligence-v781', $base . 'github-release-intelligence-v7.8.1.js', array(), self::VERSION, true);
     }
 
     private function notice_key() {

@@ -87,4 +87,4 @@ foreach ($checks as $label => $passed) {
         exit(1);
     }
 }
-echo 'v7.8.0 Release Operations runtime contract passed (' . count($checks) . " checks).\n";
+echo 'v7.8.1 Release Operations runtime contract passed (' . count($checks) . " checks).\n";

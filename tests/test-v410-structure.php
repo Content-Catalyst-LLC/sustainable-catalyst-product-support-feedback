@@ -9,8 +9,8 @@ $governance = file_get_contents($plugin . '/includes/class-scfs-platform-governa
 $backend = file_get_contents($root . '/backend/app/main.py');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version' => strpos($main, 'Version: 7.8.0') !== false,
-    'runtime version' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version' => strpos($main, 'Version: 7.8.1') !== false,
+    'runtime version' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'platform class file' => file_exists($plugin . '/includes/class-scfs-product-support-platform.php'),
     'content operations class file' => file_exists($plugin . '/includes/class-scfs-support-content-operations.php'),
     'content operations stylesheet' => file_exists($plugin . '/assets/support-content-operations.css'),
@@ -67,8 +67,8 @@ $checks = array(
     'backend support content tests' => file_exists($root . '/backend/tests/test_support_content_operations.py'),
     'backend support content capabilities' => strpos($backend, '/v1/support-content/capabilities') !== false,
     'backend platform tests' => file_exists($root . '/backend/tests/test_product_support_platform.py'),
-    'manifest version' => is_array($manifest) && ($manifest['version'] ?? '') === '7.8.0',
-    'manifest release name' => is_array($manifest) && ($manifest['release_name'] ?? '') === 'GitHub Release Intelligence',
+    'manifest version' => is_array($manifest) && ($manifest['version'] ?? '') === '7.8.1',
+    'manifest release name' => is_array($manifest) && ($manifest['release_name'] ?? '') === 'Private Repository Release Bridge',
     'embedded mode option' => strpos($platform, "'default_mode' => 'standalone'") !== false && strpos($platform, "'embedded_default_view' => 'resolve'") !== false,
     'branding presets' => strpos($platform, "'sustainable-catalyst'") !== false && strpos($platform, "'inherit'") !== false && strpos($platform, "'custom'") !== false,
     'branding token filter' => strpos($platform, 'scfs_support_branding_tokens') !== false,

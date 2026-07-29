@@ -6,8 +6,8 @@ $class = file_get_contents($plugin . '/includes/class-scfs-editorial-governance.
 $backend = file_get_contents($root . '/backend/app/editorial_governance.py');
 $manifest = json_decode(file_get_contents($root . '/feature_suggestions_manifest.json'), true);
 $checks = array(
-    'plugin version header' => strpos($main, 'Version: 7.8.0') !== false,
-    'main version constant' => strpos($main, "const VERSION = '7.8.0';") !== false,
+    'plugin version header' => strpos($main, 'Version: 7.8.1') !== false,
+    'main version constant' => strpos($main, "const VERSION = '7.8.1';") !== false,
     'editorial include' => strpos($main, "class-scfs-editorial-governance.php") !== false,
     'editorial instance' => strpos($main, 'SCFS_Editorial_Governance::instance();') !== false,
     'editorial activation' => strpos($main, 'SCFS_Editorial_Governance::activate();') !== false,
@@ -26,7 +26,7 @@ $checks = array(
     'backend module version' => strpos($backend, 'version: str = "5.1.0"') !== false,
     'backend transition evaluator' => strpos($backend, 'def evaluate_editorial_transition') !== false,
     'backend standards scorer' => strpos($backend, 'def score_documentation_standards') !== false,
-    'manifest version' => ($manifest['version'] ?? '') === '7.8.0',
+    'manifest version' => ($manifest['version'] ?? '') === '7.8.1',
     'governance documentation' => file_exists($root . '/docs/documentation-workflow-editorial-governance.md'),
     'transition example' => file_exists($root . '/examples/editorial-transition-decision.json'),
     'standards example' => file_exists($root . '/examples/documentation-standards-score.json'),

@@ -9,7 +9,7 @@ from typing import Dict, List, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-VERSION = "7.8.0"
+VERSION = "7.8.1"
 SCHEMA = "scfs-help-desk-secure-evidence/1.0"
 
 Classification = Literal["private_support", "confidential", "security_sensitive", "synthetic_sample"]

@@ -14,7 +14,7 @@ def test_platform_capabilities():
     response = c.get('/v1/platform/capabilities')
     assert response.status_code == 200
     data = response.json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['human_review_required'] is True
     assert 'survey_descriptive_analysis' in data['capabilities']
 
@@ -32,7 +32,7 @@ def test_knowledge_base_capabilities():
     response = c.get('/v1/knowledge-base/capabilities')
     assert response.status_code == 200
     data = response.json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['schema'] == 'scfs-support-knowledge-base/1.0'
     assert data['public_content_only'] is True
     assert data['private_suggestion_text_exposed'] is False
@@ -42,7 +42,7 @@ def test_product_support_navigation_capabilities():
     response = c.get('/v1/product-support/capabilities')
     assert response.status_code == 200
     data = response.json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert 'embedded_view_switching' in data['capabilities']
     assert 'browser_history_navigation' in data['capabilities']
     assert data['private_case_storage'] is False
@@ -52,7 +52,7 @@ def test_guided_resolution_capabilities():
     response = c.get('/v1/guided-resolution/capabilities')
     assert response.status_code == 200
     data = response.json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['private_case_storage'] is False
 
 def test_guided_resolution_ranking_prioritizes_current_issue():
@@ -96,7 +96,7 @@ def test_release_board_capabilities():
     response = c.get('/v1/release-board/capabilities')
     assert response.status_code == 200
     data = response.json()
-    assert data['version'] == '7.8.0'
+    assert data['version'] == '7.8.1'
     assert data['shortcode'] == 'sc_release_board'
     assert data['canonical_registry_source'] is True
     assert data['private_plugin_paths_exposed'] is False
@@ -110,7 +110,7 @@ def test_release_board_projection_endpoint():
                 'name': 'Sustainable Catalyst Product Support and Feedback Platform',
                 'short_name': 'Support and Feedback',
                 'family': 'foundation',
-                'version': '7.8.0',
+                'version': '7.8.1',
                 'status': 'current',
                 'display_order': 20,
                 'version_source': 'wordpress_plugin'
