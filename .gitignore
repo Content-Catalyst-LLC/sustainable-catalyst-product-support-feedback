@@ -10,3 +10,29 @@ exports/*.csv
 exports/*.json
 exports/*.xlsx
 !exports/.gitkeep
+
+# Generated release packages and staging.
+/dist/
+/release-staging/
+/*.zip
+/*.tgz
+/*.tar.gz
+
+# Historical/generated release artifacts belong in Git history or docs, not repository root.
+/RELEASE_NOTES_*.md
+/SUSTAINABLE_CATALYST_*_RELEASE_NOTES.md
+/GIT_COMMIT_*.txt
+/*_TERMINAL_COMMANDS.txt
+/VALIDATION_*.txt
+/INSTALLER_VALIDATION_*.txt
+/INSTALLER_REPAIR_VALIDATION_*.txt
+/PACKAGE_VALIDATION_*.txt
+/*_SHA256SUMS.txt
+/REPOSITORY_RENAME_STEPS_*.txt
+/*_REPAIR_*.txt
+/feature_suggestions_manifest-v*.json
+/release-manifest-v*.json
+
+# One-off per-version build/install/validation helpers belong under tools/ or release bundles.
+/install_and_push_*.sh
+/validate_v*.sh

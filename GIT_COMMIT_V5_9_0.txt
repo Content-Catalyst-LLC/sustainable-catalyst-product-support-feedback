@@ -1,9 +1,0 @@
-Sustainable Catalyst Product Support and Feedback Platform v5.9.0
-
-Validated isolated source commit:
-5e49b48e54218ca2066023d97b5fac265a9a121d
-
-Annotated tag:
-v5.9.0
-
-This isolated validation commit was created locally and was not pushed. The macOS installer creates the deployment commit against the current GitHub main branch.

@@ -1,3 +1,0 @@
-Release v7.6.1: Release Operations Stabilization
-
-Adds the Release Operations control plane, synchronization freshness governance, bulk operations, integrity auditing, and non-secret operational reporting while preserving legacy compatibility.

@@ -1,1 +1,0 @@
-The validated isolated release commit and v6.9.0 tag are recorded in the release bundle commit record.

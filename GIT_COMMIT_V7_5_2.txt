@@ -1,9 +1,0 @@
-Release v7.5.2: Canonical Plugin Mapping and Review Workflow
-
-- add canonical-product dropdown decisions to Plugin Discovery
-- persist administrator mappings and canonical aliases
-- add collision protection and duplicate reassignment
-- add ignore, restore, and mapping-removal workflows
-- add REST fragment refresh with non-JavaScript fallback
-- preserve legacy plugin folder, shortcodes, and accessibility behavior
-- validate 271 PHP contracts and 318 backend tests

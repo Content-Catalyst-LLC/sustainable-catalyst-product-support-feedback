@@ -1,8 +1,0 @@
-Release v7.7.0 — Canonical Product Registry Administration
-
-- add searchable and filterable canonical product administration
-- add governed lifecycle states and five-family console ordering
-- add accessible drag-and-drop and keyboard ordering
-- add product creation, duplicate merge, alias collision review, archive, and restore
-- add dry-run import, automatic backups, rollback, export, history, and WP-CLI reports
-- preserve canonical IDs, plugin mappings, GitHub connections, shortcodes, accessibility, and plugin folder

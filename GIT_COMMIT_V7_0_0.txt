@@ -1,7 +1,0 @@
-Product Support and Feedback Platform v7.0.0
-Connected Help Desk and Support Operations Platform
-
-Validated isolated commit: 2685a6722e10871aac019b4c9113962124e9c013
-Annotated tag: v7.0.0
-
-The isolated commit and tag were created for release validation and were not pushed from this environment.

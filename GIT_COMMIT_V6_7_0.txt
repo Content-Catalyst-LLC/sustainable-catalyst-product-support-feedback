@@ -1,8 +1,0 @@
-Product Support and Feedback Platform v6.7.0 — Workflow Automation and Operational Rules
-
-Validated isolated source commit:
-aded43ec650bb456426879876fbc6efc4f50c8cf
-
-Annotated tag: v6.7.0
-
-This isolated commit and tag were created for release validation. They were not pushed from this environment.

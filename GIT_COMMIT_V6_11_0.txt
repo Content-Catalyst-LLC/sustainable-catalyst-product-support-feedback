@@ -1,5 +1,0 @@
-Product Support and Feedback Platform v6.11.0
-Release: API, Webhooks, and External Integrations
-Validated isolated source commit: 692a065a7a95c67dd37f0c6c558b9491919f8dd5
-Annotated tag: v6.11.0
-Remote push performed by this environment: no

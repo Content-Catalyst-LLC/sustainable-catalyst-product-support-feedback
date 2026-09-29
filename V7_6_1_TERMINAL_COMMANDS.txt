@@ -1,8 +1,0 @@
-Sustainable Catalyst Product Support and Feedback Platform v7.6.1
-
-From Downloads:
-
-cd ~/Downloads
-INSTALLER="$(ls -t install_and_push_sustainable_catalyst_product_support_feedback_v7_6_1_macos*.sh | head -1)"
-chmod +x "$INSTALLER"
-bash "$INSTALLER"

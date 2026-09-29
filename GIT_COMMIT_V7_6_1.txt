@@ -1,3 +1,0 @@
-Release v7.6.1: Release Operations Stabilization
-
-Adds exact GitHub endpoint and HTTP diagnostics, successful-retry stale-error clearing, active-plugin mapping integrity checks, footer destination verification, cache invalidation governance, and one-click operational stabilization.

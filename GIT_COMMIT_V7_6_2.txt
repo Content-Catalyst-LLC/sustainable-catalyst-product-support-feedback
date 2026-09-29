@@ -1,3 +1,0 @@
-Release v7.6.2 — Product Connection Editor
-
-Add a single governed editor for canonical product identity, active WordPress plugin mapping, GitHub source, Release Console presentation, public routes, aliases, validation, reset controls, and connection history.

@@ -1,12 +1,36 @@
-## Current release: v7.8.1 — GitHub Release Intelligence
-
-**GitHub Release Intelligence** adds governed release and prerelease authority, semantic-tag fallback, repository and release asset evidence, rate-limit and token-scope diagnostics, synchronization history, configurable polling, and webhook replay protection.
-
-See `docs/github-release-intelligence-v7.8.1.md`.
-
 # Sustainable Catalyst Product Support and Feedback Platform
 
-**Current release: v7.8.1 — GitHub Release Intelligence**
+Sustainable Catalyst Product Support and Feedback Platform is the support, documentation, feedback, help-desk, release-intelligence, and product-operations layer of the Sustainable Catalyst platform.
+
+**Current release:** v7.8.1 — Private Repository Release Bridge
+
+## Architecture
+
+The platform combines public support, private support operations, governed product feedback, release intelligence, and a deterministic backend while preserving human control over consequential actions.
+
+- **Public support** — searchable support center, knowledge base, unified search, known issues, release intelligence, product embeds, and customer-facing support routes.
+- **Product feedback** — structured suggestions, surveys, prioritization evidence, roadmap signals, product-signal intelligence, and documentation-effectiveness analysis.
+- **Help desk** — governed case intake, agent workspaces, queues, assignment, requester portals, conversations, service levels, secure evidence, knowledge-assisted resolution, workflow automation, email channels, quality analytics, and institutional workspaces.
+- **Release intelligence** — canonical product registry, installed-plugin discovery, GitHub release synchronization, release-console projection, repository diagnostics, and release continuity.
+- **Private repository bridge** — server-side GitHub App or approved token access for selected private repositories without exposing private repository URLs, credentials, branches, assets, or commit identifiers in public output.
+- **Backend runtime** — FastAPI support-intelligence services and deterministic analysis contracts.
+- **WordPress product** — public and administrative support interfaces, REST APIs, release console, product registry, and help-desk workflows.
+- **Governed integrations** — scoped APIs, signed webhooks, retries, external-system links, and privacy-aware handoffs.
+
+The platform does not automatically publish private information, make privileged administrative changes, or promote AI-generated support conclusions without the configured review and authorization boundaries.
+
+## Repository layout
+
+- `.github/` — repository automation.
+- `backend/` — FastAPI support-intelligence service and backend tests.
+- `docs/` — current architecture, feature, governance, and release documentation.
+- `examples/` — synthetic and contract examples.
+- `exports/` — export placeholder/state boundary.
+- `schemas/` — versioned support and integration contracts.
+- `tests/` — WordPress, integration, and release contract tests.
+- `tools/` — maintained repository and registry tooling.
+- `wordpress/` — canonical WordPress plugin source; the legacy-compatible plugin directory name remains `sustainable-catalyst-feature-suggestions`.
+- `feature_suggestions_manifest.json` — current canonical product/repository capability manifest.
 
 ## Primary public shortcodes
 
@@ -19,57 +43,12 @@ See `docs/github-release-intelligence-v7.8.1.md`.
 - `[scfs_support_embed product="decision-studio"]`
 - `[scfs_help_desk_customer_portal]`
 
-## Repository layout
+## Release history
 
-- `wordpress/` — WordPress plugin source (legacy compatibility folder `sustainable-catalyst-feature-suggestions` preserved)
-- `backend/` — deterministic FastAPI support intelligence service
-- `schemas/` — versioned contracts
-- `examples/` — synthetic public examples
-- `tests/` — WordPress contract tests
-- `docs/` — implementation and governance guides
+Historical root-level release notes, build validations, terminal-command files, versioned manifests, installer scripts, package receipts, and packaged WordPress ZIPs are intentionally not retained on `main`.
 
+Canonical current documentation remains under `docs/`, while Git history preserves previous release artifacts.
 
-## v6.6.0
+The exact repository state immediately before the September 29, 2026 cleanup is preserved on:
 
-Adds agent-governed knowledge recommendations, duplicate review, similar-case signals, guided plans, and privacy-safe documentation promotion.
-
-## v6.5.0
-
-Adds secure evidence intake, delegated attachment metadata, diagnostic bundles, access governance, retention review, redaction state, and append-only evidence events.
-
-## v6.4.0
-
-Adds service policies, support calendars, response and resolution clocks, pause accounting, warnings, breaches, and escalation governance.
-
-## v6.3.0
-
-Adds secure requester access links, token-to-session exchange, participant-visible conversations, requester replies, bounded resolution and reopening actions, private satisfaction feedback, portal REST contracts, and Contact and Engagement notification handoffs.
-
-## v6.2.0
-
-Adds the private Agent Workspace, built-in and team queues, explicit assignment, workload summaries, saved views, bulk operations, and a complete private case workspace.
-
-## v6.10.0 — Institutional Workspaces and Access Governance
-
-Private organizational workspaces, least-privilege membership, support entitlements, explicit case access, private knowledge collections, append-only audit evidence, retention governance, and privacy-safe institutional reporting.
-
-
-## v6.12.0 — Reliability, Security, Privacy, and Production Hardening
-
-Adds rate limits, abuse review, private security evidence, privacy operations, audit exports, backup integrity, recovery drills, security-header review, accessibility and performance checks, and human-authorized production gates.
-
-## v6.11.0 — API, Webhooks, and External Integrations
-
-Adds least-privilege integration scopes, signed outbound events, retry and dead-letter review, external relationships, and append-only integration evidence.
-
-## Repository identity
-
-- Canonical repository: `Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback`
-- Legacy repository: `Content-Catalyst-LLC/sustainable-catalyst-feature-suggestions`
-- Canonical local folder: `sustainable-catalyst-product-support-feedback`
-- WordPress plugin folder: `sustainable-catalyst-feature-suggestions`
-
-
-## v7.6.2 — Product Connection Editor
-
-Use **Support & Feedback → Product Connections** to manage one canonical product, active WordPress plugin, GitHub repository, Release Console presentation, public routes, aliases, validation, and connection history from one governed screen.
+`archive/pre-root-cleanup-2026-09-29-product-support-feedback`

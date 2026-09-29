@@ -1,6 +1,0 @@
-cd ~/Downloads
-chmod +x install_and_push_sustainable_catalyst_product_support_feedback_v7_5_2_macos.sh
-./install_and_push_sustainable_catalyst_product_support_feedback_v7_5_2_macos.sh
-
-# Validation only
-./install_and_push_sustainable_catalyst_product_support_feedback_v7_5_2_macos.sh --preflight

@@ -1,7 +1,0 @@
-Sustainable Catalyst Product Support and Feedback Platform v5.2.9
-
-cd ~/Downloads
-chmod +x install_and_push_v5_2_9_macos.sh
-./install_and_push_v5_2_9_macos.sh
-
-The installer uses Python 3.13 or 3.12, creates a safety backup, validates the release, commits it, and pushes main.

@@ -1,8 +1,0 @@
-Product Support and Feedback Platform v7.0.1
-
-- migrate active repository identity to Content-Catalyst-LLC/sustainable-catalyst-product-support-feedback
-- add legacy-folder detection and safe local rename
-- preserve WordPress plugin folder, text domain, and runtime contracts
-- add repository identity manifests, documentation, and validation
-
-Annotated tag: v7.0.1
