@@ -114,6 +114,10 @@ def _changed(previous: str, current: str) -> bool:
     return previous != current
 
 
+# Compare remote/local fingerprints before proposing a WordPress action. A
+# changed published record becomes a review copy rather than an overwrite;
+# this function returns a decision only and performs no repository or site
+# write. Hash inputs must come from the same canonicalization rules.
 def evaluate_repository_candidate(evidence: RepositoryCandidateEvidence) -> RepositorySyncDecision:
     if not evidence.existing_record:
         return RepositorySyncDecision(
@@ -167,6 +171,10 @@ def evaluate_repository_candidate(evidence: RepositoryCandidateEvidence) -> Repo
     )
 
 
+# Classify missing source, unknown baseline, one-sided edits and conflicts
+# separately so automation cannot silently treat a local edit as a remote
+# update. The result flags human attention; it does not resolve ownership or
+# choose a merge winner.
 def evaluate_repository_drift(evidence: RepositoryDriftEvidence) -> RepositoryDriftResult:
     if evidence.source_missing:
         state: Literal["aligned", "local_edit", "remote_update", "conflict", "source_missing", "unknown"] = "source_missing"
@@ -203,6 +211,9 @@ def evaluate_repository_drift(evidence: RepositoryDriftEvidence) -> RepositoryDr
     )
 
 
+# Produce a non-mutating release plan from tag/date/note and existing-record
+# evidence. Blockers and warnings are explicit; publication remains a human
+# review action, not a side effect of planning.
 def plan_release_sync(evidence: ReleaseSourceEvidence) -> ReleaseSyncPlan:
     title = (evidence.title or evidence.tag or "Repository release").strip()
     blockers: List[str] = []
