@@ -41,6 +41,11 @@ try {
     $assert($m->batch($run['id'])===$run,'completed batch replay is idempotent');
     $assert($m->preview($prefix)['counts']['unchanged']===5,'repeated release preview finds no duplicates');
     $assert(count($run['events'])>=7,'run records actor-attributed audit events');
+    $interrupted=$run; $interrupted['state']='running'; $interrupted['cursor']=4; $interrupted['records'][4]['state']='intent';
+    update_option('scfs_kb_run_'.$run['id'],$interrupted,false);
+    $reconciled=$m->batch($run['id'],1);
+    $assert($reconciled['state']==='complete' && $reconciled['records'][4]['state']==='applied' && $m->preview($prefix)['counts']['unchanged']===5,'interrupted persisted write reconciles without duplicate or reapplying content');
+    $run=$reconciled;
     $first=$run['records'][0]['post_id'];$published=$run['records'][1]['post_id'];$manual=$run['records'][2]['post_id'];$pending=$run['records'][4]['post_id'];
     $before_first=get_post($first,ARRAY_A);
     $GLOBALS['wpdb']->update($GLOBALS['wpdb']->posts,array('post_status'=>'publish'),array('ID'=>$published));clean_post_cache($published);update_post_meta($published,'_scfs_editorial_state','approved');$permalink=get_permalink($published);

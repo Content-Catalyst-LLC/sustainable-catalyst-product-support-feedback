@@ -37,6 +37,7 @@ def validate_releases():
         assert (directory/'articles.json').stat().st_size<=2097152
         for a in articles:
             assert a['privacy']=='public-review-candidate' and a['license']=='CC-BY-4.0'
+            assert a['content_sha256']==hashlib.sha256(a['content'].encode()).hexdigest()
             assert a['sources'] and len(re.sub('<[^>]+>',' ',a['content']).split())>=500
             assert set(a.get('related',[]))<=ids
             assert not re.search(r'<(?:script|iframe)\b|javascript:|onerror\s*=',a['content'],re.I)
@@ -48,7 +49,7 @@ def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--output', type=pathlib.Path, required=True); args=parser.parse_args()
     args.output.mkdir(parents=True,exist_ok=True)
     validate_releases();
-    record=inventory(); (args.output/'source-inventory.json').write_text(json.dumps(record,indent=2)+'\n')
+    record=inventory(); record['review_release_article_count']=sum(len(json.loads(f.read_text())) for f in (PLUGIN/'content/knowledge-base/releases').glob('*/articles.json')); (args.output/'source-inventory.json').write_text(json.dumps(record,indent=2)+'\n')
     archive=args.output/'sustainable-catalyst-feature-suggestions-7.8.2-alpha.2.zip'
     checksums={}
     with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:

@@ -22,13 +22,13 @@ Initial Site/Workbench test commands lacked `PYTHONPATH=backend` and failed coll
 
 ## Reproduce the examples
 
-Use Python 3.14.7 and `requirements.lock.txt` in an isolated virtual environment. Place each cited repository checkout under the adjacent `apps/{workbench,site-intelligence,lab,decision-studio}` directory at the SHA in `coverage-summary.json`. From this folder run:
+Use Python 3.14.7 and `requirements.lock.txt` in an isolated virtual environment. Place each cited repository checkout under a common source root with `{workbench,site-intelligence,lab,decision-studio}` subdirectories at the SHA in `coverage-summary.json`. From this folder run:
 
 ```sh
-python run_examples.py --app workbench
-python run_examples.py --app site-intelligence
-python run_examples.py --app lab
-python run_examples.py --app decision-studio
+python run_examples.py --sources /path/to/pinned-app-checkouts --app workbench
+python run_examples.py --sources /path/to/pinned-app-checkouts --app site-intelligence
+python run_examples.py --sources /path/to/pinned-app-checkouts --app lab
+python run_examples.py --sources /path/to/pinned-app-checkouts --app decision-studio
 ```
 
 The runner performs no external requests. Site storage is a temporary directory. Lab time is controlled only inside the deterministic software fixture; real measurements must retain truthful timestamps. Decision timestamps are not asserted as reproducible. Source and fixture input hashes, units, expected values and tolerances are part of the draft guides and receipts. The numerical fixtures test software behavior, not scientific conclusions.
