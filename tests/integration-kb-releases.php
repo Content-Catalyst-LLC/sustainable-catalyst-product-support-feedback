@@ -23,7 +23,12 @@ try {
     $snapshot=array(); foreach($created as $id) $snapshot[$id]=array(get_post($id,ARRAY_A),get_post_meta($id));
     $count=(int)$GLOBALS['wpdb']->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->posts} WHERE post_type='sc_support_article'");
     deactivate_plugins('sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php');
+    $invalid_schema_queries=array();
+    $schema_watch=static function($sql) use (&$invalid_schema_queries) { if (preg_match('/ADD PRIMARY KEY.*`(?:UNIQUE|KEY)`/i',$sql)) $invalid_schema_queries[]=$sql; return $sql; };
+    add_filter('query',$schema_watch);
     $activation=activate_plugin('sustainable-catalyst-feature-suggestions/sustainable-catalyst-feature-suggestions.php');
+    remove_filter('query',$schema_watch);
+    $assert(!$invalid_schema_queries,'reactivation schema reconciliation emits no malformed duplicate-primary-key queries');
     $assert(!is_wp_error($activation),'real plugin reactivation succeeds');
     SCFS_Integrated_Knowledge_Base::instance()->maybe_import_documentation();
     $legacy=SCFS_Integrated_Knowledge_Base::instance()->import_documentation('publish');

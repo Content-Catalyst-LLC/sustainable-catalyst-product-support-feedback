@@ -111,7 +111,10 @@ final class SCFS_Connected_Help_Desk_Platform {
             created_by bigint(20) unsigned NOT NULL DEFAULT 0,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,
-            PRIMARY KEY (id), UNIQUE KEY session_uuid (session_uuid), KEY case_id (case_id), KEY operating_state (operating_state)
+            PRIMARY KEY  (id),
+            UNIQUE KEY session_uuid (session_uuid),
+            KEY case_id (case_id),
+            KEY operating_state (operating_state)
         ) $charset";
         $sql[] = "CREATE TABLE {$t['journey_records']} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -125,7 +128,10 @@ final class SCFS_Connected_Help_Desk_Platform {
             evidence_sha256 char(64) NOT NULL,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,
-            PRIMARY KEY (id), KEY session_id (session_id), KEY case_id (case_id), KEY stage_state (stage_state)
+            PRIMARY KEY  (id),
+            KEY session_id (session_id),
+            KEY case_id (case_id),
+            KEY stage_state (stage_state)
         ) $charset";
         $sql[] = "CREATE TABLE {$t['module_health']} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -136,7 +142,10 @@ final class SCFS_Connected_Help_Desk_Platform {
             readiness_score tinyint(3) unsigned NOT NULL DEFAULT 0,
             evidence_sha256 char(64) NOT NULL,
             checked_at datetime NOT NULL,
-            PRIMARY KEY (id), KEY module_key (module_key), KEY health_state (health_state), KEY checked_at (checked_at)
+            PRIMARY KEY  (id),
+            KEY module_key (module_key),
+            KEY health_state (health_state),
+            KEY checked_at (checked_at)
         ) $charset";
         $sql[] = "CREATE TABLE {$t['command_events']} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -151,7 +160,10 @@ final class SCFS_Connected_Help_Desk_Platform {
             authorized_by bigint(20) unsigned DEFAULT NULL,
             authorized_at datetime DEFAULT NULL,
             created_at datetime NOT NULL,
-            PRIMARY KEY (id), UNIQUE KEY command_uuid (command_uuid), KEY command_state (command_state), KEY case_id (case_id)
+            PRIMARY KEY  (id),
+            UNIQUE KEY command_uuid (command_uuid),
+            KEY command_state (command_state),
+            KEY case_id (case_id)
         ) $charset";
         $sql[] = "CREATE TABLE {$t['handoff_contexts']} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -166,7 +178,9 @@ final class SCFS_Connected_Help_Desk_Platform {
             private_message_content_included tinyint(1) NOT NULL DEFAULT 0,
             attachment_content_included tinyint(1) NOT NULL DEFAULT 0,
             created_at datetime NOT NULL,
-            PRIMARY KEY (id), KEY case_id (case_id), KEY destination_module (destination_module)
+            PRIMARY KEY  (id),
+            KEY case_id (case_id),
+            KEY destination_module (destination_module)
         ) $charset";
         $sql[] = "CREATE TABLE {$t['operating_reports']} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -179,7 +193,10 @@ final class SCFS_Connected_Help_Desk_Platform {
             private_content_included tinyint(1) NOT NULL DEFAULT 0,
             generated_by bigint(20) unsigned NOT NULL DEFAULT 0,
             generated_at datetime NOT NULL,
-            PRIMARY KEY (id), UNIQUE KEY report_uuid (report_uuid), KEY report_type (report_type), KEY generated_at (generated_at)
+            PRIMARY KEY  (id),
+            UNIQUE KEY report_uuid (report_uuid),
+            KEY report_type (report_type),
+            KEY generated_at (generated_at)
         ) $charset";
         foreach ($sql as $statement) {
             dbDelta($statement);
