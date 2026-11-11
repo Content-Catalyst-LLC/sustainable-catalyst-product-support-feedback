@@ -66,25 +66,13 @@ final class SCFS_Integrated_Knowledge_Base {
     }
 
     public function allow_integrated_publication($allowed, $data, $postarr) {
-        $post_type = isset($data['post_type']) ? (string) $data['post_type'] : (isset($postarr['post_type']) ? (string) $postarr['post_type'] : '');
-        if ($this->importing_documentation && $post_type === SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE) {
-            return true;
-        }
+        // No first-party exception: WordPress editorial approval is authoritative.
         return $allowed;
     }
 
     public static function activate() {
-        $instance = self::instance();
-        $page_id = $instance->ensure_dedicated_knowledge_base_page();
-        if ($page_id) {
-            $instance->persist_legacy_route_fallback($page_id);
-        }
-        update_option(self::ROUTE_VERSION_OPTION, self::ROUTE_VERSION, false);
-        $report = $instance->import_documentation('publish');
-        update_option(self::REPORT_OPTION, $report, false);
-        if (!empty($report['ok'])) {
-            update_option(self::IMPORT_OPTION, self::CONTENT_VERSION, false);
-        }
+        // Activation/reactivation must never install or publish article content.
+        // Content updates are explicit, privileged and review-only.
     }
 
     /**
@@ -330,18 +318,7 @@ final class SCFS_Integrated_Knowledge_Base {
     }
 
     public function maybe_import_documentation() {
-        if (!current_user_can('manage_options')) {
-            return;
-        }
-        if ((string) get_option(self::IMPORT_OPTION, '') === self::CONTENT_VERSION) {
-            return;
-        }
-        $report = $this->import_documentation('publish');
-        update_option(self::REPORT_OPTION, $report, false);
-        if (!empty($report['ok'])) {
-            update_option(self::IMPORT_OPTION, self::CONTENT_VERSION, false);
-            flush_rewrite_rules(false);
-        }
+        // Kept as a compatibility entry point. Admin visits/upgrades are read-only.
     }
 
     private function plugin_root() {
@@ -571,141 +548,135 @@ final class SCFS_Integrated_Knowledge_Base {
         if ($collection_ids) wp_set_object_terms($post_id, $collection_ids, SCFS_Knowledge_Base_Foundation::COLLECTION_TAXONOMY, false);
     }
 
-    private function update_article_meta($post_id, $article, $hash, $product_slug, $section_slug, $manual_override) {
-        $minutes = 0;
-        if (preg_match('/(\d+)/', (string) $article['estimated_reading_time'], $matches)) $minutes = absint($matches[1]);
-        $meta = array(
-            '_scfs_kb_summary' => $article['summary'],
-            '_scfs_article_audience' => $article['audience'],
-            '_scfs_article_prerequisites' => $article['prerequisites'],
-            '_scfs_estimated_minutes' => $minutes,
-            '_scfs_last_verified_version' => $article['last_verified_version'],
-            '_scfs_article_template' => $this->article_type_slug($article),
-            '_scfs_kb_schema_version' => '1.0',
-            self::CONTENT_KEY_META => $article['content_key'],
-            self::LEGACY_CONTENT_KEY_META => $article['content_key'],
-            self::SOURCE_VERSION_META => self::CONTENT_VERSION,
-            self::PRODUCT_SLUG_META => $product_slug,
-            self::SECTION_SLUG_META => $section_slug,
-            '_scfs_source_kind' => 'integrated-knowledge-base',
-            '_scfs_source_reference' => $article['source_reference'],
-            '_scfs_source_version' => self::CONTENT_VERSION,
-            '_scfs_lifecycle' => 'published',
-            '_scfs_article_status' => 'published',
-            '_scfs_verified_at' => '2026-07-17',
-            '_scfs_human_review_required' => '0',
-            '_scfs_sample_csv_url' => $this->sample_url($article['sample_csv']),
-            '_scfs_sample_json_url' => $this->sample_url($article['sample_json']),
-            '_scfs_integrated_manual_override' => $manual_override ? '1' : '0',
-            '_scfs_editorial_state' => 'published',
-            '_scfs_editorial_change_summary' => 'Published from the verified Sustainable Catalyst v5.1.0 first-party documentation corpus.',
-            '_scfs_editorial_approval_note' => 'System publication is limited to the validated integrated Knowledge Base migration.',
-            '_scfs_editorial_approved_at' => current_time('mysql'),
-            '_scfs_editorial_schema' => class_exists('SCFS_Editorial_Governance') ? SCFS_Editorial_Governance::SCHEMA_VERSION : '1.0',
-        );
-        if (!$manual_override) $meta[self::GENERATED_HASH_META] = $hash;
-        foreach ($meta as $key => $value) update_post_meta($post_id, $key, $value);
-    }
-
-    public function import_documentation($status = 'publish') {
-        $validation = $this->validate_content();
-        if (!$validation['ok']) {
-            return array('ok' => false, 'errors' => $validation['errors'], 'validation' => $validation);
-        }
-        $data = $this->content_data();
-        $sections = $this->sections();
-        $report = array(
-            'ok' => true,
-            'content_version' => self::CONTENT_VERSION,
-            'requested_status' => 'publish',
-            'created' => 0,
-            'updated' => 0,
-            'repaired' => 0,
-            'manual_edits_preserved' => 0,
-            'published' => 0,
-            'errors' => array(),
-            'time' => current_time('mysql'),
-        );
-        $this->importing_documentation = true;
-        foreach ($data['articles'] as $article) {
-            $product_slug = sanitize_title($article['product_slug']);
-            $section_slug = $this->section_for_article($article);
-            $csv_url = $this->sample_url($article['sample_csv']);
-            $json_url = $this->sample_url($article['sample_json']);
-            $content = str_replace(array('{{sample_csv_url}}', '{{sample_json_url}}'), array(esc_url($csv_url), esc_url($json_url)), (string) $article['content']);
-            $content = str_replace('<p><strong>Status:</strong> Draft for product and editorial review.</p>', '<p><strong>Status:</strong> Published support documentation.</p>', $content);
-            $hash = hash('sha256', $article['title'] . "\n" . $content);
-            $post_id = $this->find_article_id($article);
-            $manual_override = false;
-            if ($post_id) {
-                $existing = get_post($post_id);
-                $prior_hash = (string) get_post_meta($post_id, self::GENERATED_HASH_META, true);
-                if ($prior_hash === '') $prior_hash = (string) get_post_meta($post_id, self::LEGACY_HASH_META, true);
-                $current_hash = $existing ? hash('sha256', $existing->post_title . "\n" . $existing->post_content) : '';
-                $manual_override = $prior_hash !== '' && $current_hash !== '' && !hash_equals($prior_hash, $current_hash);
-                $payload = array(
-                    'ID' => $post_id,
-                    'post_status' => 'publish',
-                    'post_type' => SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE,
-                    'menu_order' => $sections[$section_slug]['order'],
-                );
-                if (!$manual_override) {
-                    $payload['post_title'] = $article['title'];
-                    $payload['post_name'] = $article['slug'];
-                    $payload['post_excerpt'] = $article['summary'];
-                    $payload['post_content'] = wp_slash($content);
-                }
-                $result = wp_update_post($payload, true);
-                if (is_wp_error($result)) {
-                    $report['errors'][] = $article['title'] . ': ' . $result->get_error_message();
-                    continue;
-                }
-                if ($manual_override) $report['manual_edits_preserved']++; else $report['updated']++;
-                $report['repaired']++;
-            } else {
-                $post_id = wp_insert_post(array(
-                    'post_type' => SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE,
-                    'post_title' => $article['title'],
-                    'post_name' => $article['slug'],
-                    'post_excerpt' => $article['summary'],
-                    'post_content' => wp_slash($content),
-                    'post_status' => 'publish',
-                    'menu_order' => $sections[$section_slug]['order'],
-                ), true);
-                if (is_wp_error($post_id)) {
-                    $report['errors'][] = $article['title'] . ': ' . $post_id->get_error_message();
-                    continue;
-                }
-                $report['created']++;
-            }
-            $this->update_article_meta($post_id, $article, $hash, $product_slug, $section_slug, $manual_override);
-            $this->assign_article_terms($post_id, $article, $product_slug, $section_slug);
-            if (get_post_status($post_id) === 'publish') $report['published']++;
-        }
-        $this->importing_documentation = false;
-        $report['ok'] = empty($report['errors']) && $report['published'] >= 96;
-        update_option(self::REPORT_OPTION, $report, false);
-        if ($report['ok']) update_option(self::IMPORT_OPTION, self::CONTENT_VERSION, false);
-        return $report;
+    /** Deprecated publisher. Never mutate articles via legacy callers. */
+    public function import_documentation($status = 'draft') {
+        return array('ok' => false, 'created' => 0, 'updated' => 0, 'published' => 0,
+            'errors' => array('Legacy automatic import is disabled. Use Knowledge Base Content Updates to preview and import review drafts.'));
     }
 
     private function support_knowledge_base_url($product_slug = '') {
         return $this->dedicated_knowledge_base_url($product_slug);
     }
 
-    private function all_published_articles() {
-        $posts = get_posts(array(
+    /** Public corpus queries never hydrate more than one result page. */
+    public function query_articles($filters = array(), $page = 1, $per_page = 20, $ids_only = false) {
+        $per_page = max(1, min(50, absint($per_page)));
+        $page = max(1, min(100000, absint($page)));
+        $args = array(
             'post_type' => SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE,
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'has_password' => false,
-            'orderby' => array('menu_order' => 'ASC', 'title' => 'ASC'),
-            'order' => 'ASC',
-            'suppress_filters' => false,
-        ));
-        return array_values(array_filter($posts, static function($post) {
-            return $post->post_status === 'publish' && empty($post->post_password);
-        }));
+            'post_status' => 'publish', 'has_password' => false,
+            'posts_per_page' => $per_page, 'paged' => $page,
+            'ignore_sticky_posts' => true, 'suppress_filters' => false,
+            'orderby' => array('modified' => 'DESC', 'ID' => 'DESC'),
+            'scfs_kb_filters' => $filters,
+        );
+        if ($ids_only) { $args['fields'] = 'ids'; $args['update_post_meta_cache'] = false; $args['update_post_term_cache'] = false; }
+        if (($filters['sort'] ?? '') === 'title') $args['orderby'] = array('title' => 'ASC', 'ID' => 'ASC');
+        $where = function($sql, $query) {
+            if ($query->get('scfs_kb_filters') === null || $query->get('scfs_kb_filters') === '') return $sql;
+            return $sql . $this->article_query_predicate($query->get('scfs_kb_filters'));
+        };
+        $orderby = function($sql, $query) {
+            global $wpdb;
+            $filters = $query->get('scfs_kb_filters');
+            if (!is_array($filters) || empty($filters['search']) || ($filters['sort'] ?? 'relevance') !== 'relevance') return $sql;
+            $text = (string) $filters['search']; $like = '%' . $wpdb->esc_like($text) . '%';
+            return $wpdb->prepare("(CASE WHEN {$wpdb->posts}.post_title=%s THEN 140 WHEN {$wpdb->posts}.post_title LIKE %s THEN 80 WHEN {$wpdb->posts}.post_excerpt LIKE %s THEN 40 ELSE 0 END) DESC, {$wpdb->posts}.post_modified DESC, {$wpdb->posts}.ID DESC", $text, $like, $like);
+        };
+        add_filter('posts_where', $where, 20, 2);
+        add_filter('posts_orderby', $orderby, 20, 2);
+        try { return new WP_Query($args); }
+        finally { remove_filter('posts_where', $where, 20); remove_filter('posts_orderby', $orderby, 20); }
+    }
+
+    /** Prepared EXISTS predicates avoid fan-out joins and duplicate article rows. */
+    private function article_query_predicate($filters) {
+        global $wpdb;
+        $post = $wpdb->posts;
+        $meta = function($key, $value) use ($wpdb, $post) {
+            return $wpdb->prepare("EXISTS (SELECT 1 FROM {$wpdb->postmeta} km WHERE km.post_id=$post.ID AND km.meta_key=%s AND km.meta_value=%s)", $key, $value);
+        };
+        $missing = function($key) use ($wpdb, $post) {
+            return $wpdb->prepare("NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} km WHERE km.post_id=$post.ID AND km.meta_key=%s)", $key);
+        };
+        $term = function($taxonomy, $slug) use ($wpdb, $post) {
+            return $wpdb->prepare("EXISTS (SELECT 1 FROM {$wpdb->term_relationships} kr INNER JOIN {$wpdb->term_taxonomy} kt ON kt.term_taxonomy_id=kr.term_taxonomy_id INNER JOIN {$wpdb->terms} kterm ON kterm.term_id=kt.term_id WHERE kr.object_id=$post.ID AND kt.taxonomy=%s AND kterm.slug=%s)", $taxonomy, $slug);
+        };
+        $product = function($slug) use ($meta, $missing, $term) {
+            $products = $this->products();
+            $fallback = '(' . $missing(self::PRODUCT_SLUG_META) . ' OR ' . $meta(self::PRODUCT_SLUG_META, '') . ')';
+            return '(' . $meta(self::PRODUCT_SLUG_META, $slug) . ' OR (' . $fallback . ' AND ' . $term(SCFS_Product_Integration::PRODUCT_TAXONOMY, $products[$slug]['canonical'] ?? $slug) . '))';
+        };
+        $parts = array();
+        if (!empty($filters['product'])) $parts[] = $product(sanitize_title($filters['product']));
+        if (!empty($filters['section'])) {
+            $section = sanitize_title($filters['section']);
+            $no_section = '(' . $missing(self::SECTION_SLUG_META) . ' OR ' . $meta(self::SECTION_SLUG_META, '') . ')';
+            $type = array('start-here' => 'getting-started', 'troubleshooting' => 'troubleshooting', 'technical-reference' => 'reference');
+            $fallback = isset($type[$section]) ? $term(SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY, $type[$section]) : '0=1';
+            if ($section === 'worked-examples') $fallback = 'NOT (' . implode(' OR ', array_map(function($slug) use ($term) { return $term(SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY, $slug); }, array_values($type))) . ')';
+            $parts[] = '(' . $meta(self::SECTION_SLUG_META, $section) . ' OR (' . $no_section . ' AND ' . $fallback . '))';
+        }
+        if (!empty($filters['version'])) {
+            $version = sanitize_title($filters['version']);
+            $versions = array($term(SCFS_Product_Integration::VERSION_TAXONOMY, $version));
+            foreach (array('_scfs_product_version', '_scfs_kb_product_version', '_scfs_last_verified_version') as $key) $versions[] = $wpdb->prepare("EXISTS (SELECT 1 FROM {$wpdb->postmeta} kv WHERE kv.post_id=$post.ID AND kv.meta_key=%s AND LOWER(REPLACE(REPLACE(kv.meta_value, '.', '-'), ' ', '-'))=%s)", $key, $version);
+            $parts[] = '(' . implode(' OR ', $versions) . ')';
+        }
+        foreach (array('component' => SCFS_Product_Integration::COMPONENT_TAXONOMY, 'type' => SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY) as $key => $taxonomy) {
+            if (!empty($filters[$key])) $parts[] = $term($taxonomy, sanitize_title($filters[$key]));
+        }
+        if (!empty($filters['area'])) {
+            $area = sanitize_key($filters['area']);
+            $navigation = $this->research_navigation();
+            if (!isset($navigation['areas'][$area])) { $parts[] = '0=1'; }
+            else {
+                // WordPress serializes the explicit area array; exact quoted slug avoids substring collisions.
+                $explicit = $wpdb->prepare("EXISTS (SELECT 1 FROM {$wpdb->postmeta} ka WHERE ka.post_id=$post.ID AND ka.meta_key='_scfs_kb_research_areas' AND ka.meta_value LIKE %s)", '%' . $wpdb->esc_like('"' . $area . '"') . '%');
+                $fallbacks = array();
+                foreach ($navigation['product_areas'] as $slug => $areas) if (in_array($area, $areas, true)) $fallbacks[] = $product($slug);
+                $parts[] = '(' . $explicit . ' OR (' . $missing('_scfs_kb_research_areas') . ' AND (' . ($fallbacks ? implode(' OR ', $fallbacks) : '0=1') . ')))';
+            }
+        }
+        $search = trim((string) ($filters['search'] ?? ''));
+        if ($search !== '') {
+            $words = array_slice(preg_split('/\s+/', $search), 0, 12);
+            $synonyms = class_exists('SCFS_Support_Discovery') ? SCFS_Support_Discovery::instance()->synonyms() : array();
+            foreach ($words as $word) {
+                $alternatives = array();
+                foreach (array_slice(array_merge(array($word), (array) ($synonyms[strtolower($word)] ?? array())), 0, 6) as $phrase) {
+                $like = '%' . $wpdb->esc_like($phrase) . '%';
+                $alternatives[] = $wpdb->prepare("($post.post_title LIKE %s OR $post.post_excerpt LIKE %s OR $post.post_content LIKE %s OR EXISTS (SELECT 1 FROM {$wpdb->postmeta} ks WHERE ks.post_id=$post.ID AND ks.meta_key IN ('_scfs_kb_summary','_scfs_product_version','_scfs_last_verified_version','_scfs_component','_scfs_kb_product_slug','_scfs_kb_section_slug') AND ks.meta_value LIKE %s) OR EXISTS (SELECT 1 FROM {$wpdb->term_relationships} sr INNER JOIN {$wpdb->term_taxonomy} st ON st.term_taxonomy_id=sr.term_taxonomy_id INNER JOIN {$wpdb->terms} sn ON sn.term_id=st.term_id WHERE sr.object_id=$post.ID AND st.taxonomy IN ('scfs_product','scfs_product_version','scfs_component','scfs_article_type','scfs_doc_collection') AND sn.name LIKE %s))", $like, $like, $like, $like, $like);
+                }
+                $parts[] = '(' . implode(' OR ', $alternatives) . ')';
+            }
+        }
+        return $parts ? ' AND ' . implode(' AND ', $parts) : '';
+    }
+
+    private function article_count($filters = array()) {
+        return (int) $this->query_articles($filters, 1, 1, true)->found_posts;
+    }
+
+    /** Aggregate only public eligible IDs from the same WP_Query (including site visibility filters). */
+    private function query_term_options($filters, $taxonomy) {
+        global $wpdb;
+        $clauses = null;
+        $capture = function($pieces, $query) use (&$clauses, $filters) {
+            if ($query->get('scfs_kb_filters') === $filters) $clauses = $pieces;
+            return $pieces;
+        };
+        add_filter('posts_clauses_request', $capture, PHP_INT_MAX, 2);
+        try { $this->query_articles($filters, 1, 1, true); }
+        finally { remove_filter('posts_clauses_request', $capture, PHP_INT_MAX); }
+        if (!is_array($clauses)) return array();
+        // Use structured WP clauses rather than parsing SQL containing user search literals.
+        $eligible = "SELECT DISTINCT {$wpdb->posts}.ID FROM {$wpdb->posts} " . $clauses['join'] . ' WHERE 1=1 ' . $clauses['where'];
+        if (!empty($clauses['groupby'])) $eligible .= ' GROUP BY ' . $clauses['groupby'];
+        $sql = $wpdb->prepare("SELECT t.slug, t.name, COUNT(DISTINCT r.object_id) AS article_count FROM {$wpdb->terms} t INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_id=t.term_id INNER JOIN {$wpdb->term_relationships} r ON r.term_taxonomy_id=tt.term_taxonomy_id INNER JOIN ($eligible) eligible ON eligible.ID=r.object_id WHERE tt.taxonomy=%s GROUP BY t.term_id, t.slug, t.name ORDER BY t.name ASC", $taxonomy);
+        $options = array();
+        foreach ($wpdb->get_results($sql) as $row) $options[$row->slug] = array('name' => $row->name, 'count' => (int) $row->article_count);
+        return $options;
     }
 
     private function article_product_slug($post) {
@@ -733,19 +704,6 @@ final class SCFS_Integrated_Knowledge_Base {
         return 'worked-examples';
     }
 
-    private function browser_groups($product_filter = '') {
-        $groups = array();
-        foreach ($this->all_published_articles() as $post) {
-            $product_slug = $this->article_product_slug($post);
-            if ($product_filter !== '' && $product_filter !== $product_slug) continue;
-            $section_slug = $this->article_section_slug($post);
-            if (!isset($groups[$product_slug])) $groups[$product_slug] = array();
-            if (!isset($groups[$product_slug][$section_slug])) $groups[$product_slug][$section_slug] = array();
-            $groups[$product_slug][$section_slug][] = $post;
-        }
-        return $groups;
-    }
-
     private function normalize_product_filter($slug) {
         $slug = sanitize_title($slug);
         if ($slug === '') return '';
@@ -753,18 +711,6 @@ final class SCFS_Integrated_Knowledge_Base {
             if ($slug === $product_slug || $slug === $product['canonical']) return $product_slug;
         }
         return $slug;
-    }
-
-    private function browser_category_groups($product_filter = '') {
-        $groups = array();
-        foreach ($this->all_published_articles() as $post) {
-            $product_slug = $this->article_product_slug($post);
-            if ($product_filter !== '' && $product_filter !== $product_slug) continue;
-            $section_slug = $this->article_section_slug($post);
-            if (!isset($groups[$section_slug])) $groups[$section_slug] = array();
-            $groups[$section_slug][] = $post;
-        }
-        return $groups;
     }
 
     private function article_library_meta($post) {
@@ -875,46 +821,7 @@ final class SCFS_Integrated_Knowledge_Base {
     }
 
     private function filtered_articles($product_filter = '', $section_filter = '', $search = '', $version_filter = '', $component_filter = '', $type_filter = '', $sort = 'relevance') {
-        $results = array();
-        foreach ($this->all_published_articles() as $post) {
-            if ($product_filter !== '' && $this->article_product_slug($post) !== $product_filter) continue;
-            if ($section_filter !== '' && $this->article_section_slug($post) !== $section_filter) continue;
-            if (!$this->article_matches_version($post, $version_filter)) continue;
-            if ($component_filter !== '' && !in_array($component_filter, $this->article_term_slugs($post->ID, SCFS_Product_Integration::COMPONENT_TAXONOMY), true)) continue;
-            if ($type_filter !== '' && !in_array($type_filter, $this->article_term_slugs($post->ID, SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY), true)) continue;
-            if (!get_permalink($post)) continue;
-            $results[] = $post;
-        }
-        if (class_exists('SCFS_Support_Discovery')) {
-            $ranked = SCFS_Support_Discovery::instance()->rank_articles($results, $search, $sort);
-            return array_values(array_map(static function($row) { return $row['post']; }, $ranked));
-        }
-        $results = array_values(array_filter($results, function($post) use ($search) { return $this->article_matches_search($post, $search); }));
-        if ($sort === 'title') usort($results, static function($a, $b) { return strnatcasecmp($a->post_title, $b->post_title); });
-        if ($sort === 'recent') usort($results, static function($a, $b) { return strcmp($b->post_modified_gmt, $a->post_modified_gmt); });
-        return $results;
-    }
-
-    private function browser_term_options($posts, $taxonomy, $fallback_meta = array()) {
-        $options = array();
-        foreach ($posts as $post) {
-            $terms = wp_get_post_terms($post->ID, $taxonomy);
-            if (!is_wp_error($terms)) {
-                foreach ($terms as $term) {
-                    if (!isset($options[$term->slug])) $options[$term->slug] = array('name' => $term->name, 'count' => 0);
-                    $options[$term->slug]['count']++;
-                }
-            }
-            foreach ($fallback_meta as $key) {
-                $name = trim((string) get_post_meta($post->ID, $key, true));
-                $slug = sanitize_title($name);
-                if ($slug === '') continue;
-                if (!isset($options[$slug])) $options[$slug] = array('name' => $name, 'count' => 0);
-                $options[$slug]['count']++;
-            }
-        }
-        uasort($options, static function($a, $b) { return strnatcasecmp($a['name'], $b['name']); });
-        return $options;
+        return $this->query_articles(array('product' => $product_filter, 'section' => $section_filter, 'search' => $search, 'version' => $version_filter, 'component' => $component_filter, 'type' => $type_filter, 'sort' => $sort), 1, 20)->posts;
     }
 
     private function browser_url($action, $args) {
@@ -943,11 +850,10 @@ final class SCFS_Integrated_Knowledge_Base {
         wp_enqueue_script('scfs-integrated-knowledge-base');
         $products = $this->products();
         $sections = $this->sections();
-        $groups = $this->browser_groups('');
         $limit = max(1, min(count($products), absint($atts['products'])));
         $base_url = trim((string) $atts['knowledge_base_url']);
         if ($base_url === '') $base_url = $this->dedicated_knowledge_base_url();
-        $total = count($this->all_published_articles());
+        $total = $this->article_count();
         $shown = 0;
         ob_start();
         echo '<section class="scfs-support-library-compact" aria-labelledby="scfs-support-library-compact-title">';
@@ -956,16 +862,21 @@ final class SCFS_Integrated_Knowledge_Base {
         echo '<div class="scfs-support-library-compact__stack">';
         foreach ($products as $product_slug => $product) {
             if ($shown >= $limit) break;
-            $product_groups = isset($groups[$product_slug]) ? $groups[$product_slug] : array();
-            $article_count = 0; $section_count = 0;
-            foreach ($product_groups as $articles) { if ($articles) $section_count++; $article_count += count($articles); }
+            $article_count = $this->article_count(array('product' => $product_slug));
+            $product_groups = array(); $section_count = 0;
+            foreach ($sections as $section_slug => $section) {
+                $query = $this->query_articles(array('product' => $product_slug, 'section' => $section_slug), 1, 3);
+                $product_groups[$section_slug] = $query;
+                if ($query->found_posts) $section_count++;
+            }
             if ($article_count < 1) continue;
             $open = ($shown === 0 && $atts['open_first'] === '1') ? ' open' : '';
             echo '<details class="scfs-support-library-compact__product"' . $open . '><summary><span><strong>' . esc_html($product['name']) . '</strong><small>' . esc_html($product['description']) . '</small></span><em>' . esc_html(sprintf(__('%1$d guides · %2$d categories', 'sustainable-catalyst-feature-suggestions'), $article_count, $section_count)) . '</em></summary><div class="scfs-support-library-compact__topics">';
             foreach ($sections as $section_slug => $section) {
-                $articles = isset($product_groups[$section_slug]) ? $product_groups[$section_slug] : array();
+                $category = $product_groups[$section_slug];
+                $articles = $category->posts;
                 if (!$articles) continue;
-                echo '<details class="scfs-support-library-compact__topic"><summary><span><strong>' . esc_html($section['name']) . '</strong><small>' . esc_html($section['description']) . '</small></span><em>' . esc_html(sprintf(_n('%d guide', '%d guides', count($articles), 'sustainable-catalyst-feature-suggestions'), count($articles))) . '</em></summary><div class="scfs-support-library-compact__articles">';
+                echo '<details class="scfs-support-library-compact__topic"><summary><span><strong>' . esc_html($section['name']) . '</strong><small>' . esc_html($section['description']) . '</small></span><em>' . esc_html(sprintf(_n('%d guide', '%d guides', $category->found_posts, 'sustainable-catalyst-feature-suggestions'), $category->found_posts)) . '</em></summary><div class="scfs-support-library-compact__articles">';
                 foreach ($articles as $post) $this->render_library_article_row($post);
                 echo '<a class="scfs-support-library-compact__category-link" href="' . esc_url($this->dedicated_knowledge_base_url($product_slug, $section_slug)) . '">' . esc_html__('View this category in Support', 'sustainable-catalyst-feature-suggestions') . ' →</a>';
                 echo '</div></details>';
@@ -1086,30 +997,22 @@ final class SCFS_Integrated_Knowledge_Base {
         if (!isset($navigation['areas'][$area])) $area = '';
         $products = $this->products();
         $sections = $this->sections();
-        $all_posts = $this->all_published_articles();
-        $groups = $this->browser_groups('');
         $available_products = array();
         foreach ($products as $slug => $product) {
-            $count = 0;
-            foreach (($groups[$slug] ?? array()) as $articles) $count += count($articles);
-            $product['count'] = $count; $available_products[$slug] = $product;
+            $product['count'] = $this->article_count(array('product' => $slug));
+            $available_products[$slug] = $product;
         }
         if ($product_filter !== '' && !isset($available_products[$product_filter])) $product_filter = '';
-        $category_groups = $this->browser_category_groups($product_filter);
-
-        $product_posts = array_values(array_filter($all_posts, function($post) use ($product_filter) {
-            return $product_filter === '' || $this->article_product_slug($post) === $product_filter;
-        }));
-        $version_options = $this->browser_term_options($product_posts, SCFS_Product_Integration::VERSION_TAXONOMY, array('_scfs_product_version', '_scfs_kb_product_version', '_scfs_last_verified_version'));
-        $component_options = $this->browser_term_options($product_posts, SCFS_Product_Integration::COMPONENT_TAXONOMY);
-        $type_options = $this->browser_term_options($product_posts, SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY);
-        if ($version_filter !== '' && !isset($version_options[$version_filter])) $version_filter = '';
-        if ($component_filter !== '' && !isset($component_options[$component_filter])) $component_filter = '';
-        if ($type_filter !== '' && !isset($type_options[$type_filter])) $type_filter = '';
-
-        $results = $this->filtered_articles($product_filter, $selected_section, $search, $version_filter, $component_filter, $type_filter, $sort);
-        if ($area !== '') $results = array_values(array_filter($results, function($post) use ($area) { return in_array($area, $this->article_research_areas($post), true); }));
-        $total = count($all_posts);
+        $facet_filters = array('product' => $product_filter);
+        $product_total = $this->article_count($facet_filters);
+        $version_options = $this->query_term_options($facet_filters, SCFS_Product_Integration::VERSION_TAXONOMY);
+        $component_options = $this->query_term_options($facet_filters, SCFS_Product_Integration::COMPONENT_TAXONOMY);
+        $type_options = $this->query_term_options($facet_filters, SCFS_Knowledge_Base_Foundation::ARTICLE_TYPE_TAXONOMY);
+        $page = isset($_GET['scfs_kb_page']) ? max(1, absint($_GET['scfs_kb_page'])) : 1;
+        $query = $this->query_articles(array('product' => $product_filter, 'section' => $selected_section, 'search' => $search, 'version' => $version_filter, 'component' => $component_filter, 'type' => $type_filter, 'sort' => $sort, 'area' => $area), $page, 20);
+        $results = $query->posts;
+        $result_total = (int) $query->found_posts;
+        $total = $this->article_count();
         $action = remove_query_arg(array('scfs_kb_area', 'scfs_kb_search', 'scfs_kb_product', 'scfs_kb_version', 'scfs_kb_section', 'scfs_kb_component', 'scfs_kb_type', 'scfs_kb_sort', 'scfs_kb_page'));
         $base_args = array('scfs_kb_area' => $area, 'scfs_kb_product' => $product_filter, 'scfs_kb_search' => $search, 'scfs_kb_version' => $version_filter, 'scfs_kb_section' => $selected_section, 'scfs_kb_component' => $component_filter, 'scfs_kb_type' => $type_filter, 'scfs_kb_sort' => $sort);
 
@@ -1125,8 +1028,7 @@ final class SCFS_Integrated_Knowledge_Base {
         $args = $base_args; $args['scfs_kb_area'] = '';
         echo '<a href="' . esc_url($this->browser_url($action, $args)) . '"' . ($area === '' ? ' aria-current="page"' : '') . '>All research areas</a>';
         foreach ($navigation['areas'] as $slug => $entry) {
-            $count = 0;
-            foreach ($all_posts as $post) if (in_array($slug, $this->article_research_areas($post), true)) $count++;
+            $count = $this->article_count(array('area' => $slug));
             $args = $base_args; $args['scfs_kb_area'] = $slug;
             echo '<a href="' . esc_url($this->browser_url($action, $args)) . '"' . ($area === $slug ? ' aria-current="page"' : '') . '><span>' . esc_html($entry['label']) . '</span><em>' . esc_html((string) $count) . '</em></a>';
         }
@@ -1142,7 +1044,7 @@ final class SCFS_Integrated_Knowledge_Base {
 
         echo '<section class="scfs-kb-library-nav-group"><h3>' . esc_html__('Versions', 'sustainable-catalyst-feature-suggestions') . '</h3><div class="scfs-kb-library-nav-list scfs-kb-library-nav-list--compact">';
         $args = $base_args; $args['scfs_kb_version'] = '';
-        echo '<a class="' . ($version_filter === '' ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html__('All supported versions', 'sustainable-catalyst-feature-suggestions') . '</span><em>' . esc_html((string) count($product_posts)) . '</em></a>';
+        echo '<a class="' . ($version_filter === '' ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html__('All supported versions', 'sustainable-catalyst-feature-suggestions') . '</span><em>' . esc_html((string) $product_total) . '</em></a>';
         foreach ($version_options as $slug => $option) {
             $args = $base_args; $args['scfs_kb_version'] = $slug;
             echo '<a class="' . ($slug === $version_filter ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html($option['name']) . '</span><em>' . esc_html((string) $option['count']) . '</em></a>';
@@ -1151,9 +1053,9 @@ final class SCFS_Integrated_Knowledge_Base {
 
         echo '<section class="scfs-kb-library-nav-group"><h3>' . esc_html__('Categories', 'sustainable-catalyst-feature-suggestions') . '</h3><div class="scfs-kb-library-nav-list scfs-kb-library-nav-list--compact">';
         $args = $base_args; $args['scfs_kb_section'] = '';
-        echo '<a class="' . ($selected_section === '' ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html__('All categories', 'sustainable-catalyst-feature-suggestions') . '</span><em>' . esc_html((string) count($product_posts)) . '</em></a>';
+        echo '<a class="' . ($selected_section === '' ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html__('All categories', 'sustainable-catalyst-feature-suggestions') . '</span><em>' . esc_html((string) $product_total) . '</em></a>';
         foreach ($sections as $section_slug => $section) {
-            $count = count($category_groups[$section_slug] ?? array());
+            $count = $this->article_count(array('product' => $product_filter, 'section' => $section_slug));
             if ($count < 1) continue;
             $args = $base_args; $args['scfs_kb_section'] = $section_slug;
             echo '<a class="' . ($selected_section === $section_slug ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html($section['name']) . '</span><em>' . esc_html((string) $count) . '</em></a>';
@@ -1162,7 +1064,7 @@ final class SCFS_Integrated_Knowledge_Base {
 
         echo '<div class="scfs-kb-library-results" role="region" aria-label="' . esc_attr__('Support Article results', 'sustainable-catalyst-feature-suggestions') . '" aria-live="polite">';
         $active_product = $product_filter !== '' && isset($available_products[$product_filter]) ? $available_products[$product_filter] : null;
-        echo '<header class="scfs-kb-library-results-header"><div><p class="scfs-kb-eyebrow">' . esc_html__('Support Articles', 'sustainable-catalyst-feature-suggestions') . '</p><h3>' . esc_html($area !== '' ? $navigation['areas'][$area]['label'] : ($active_product ? $active_product['name'] : __('All products', 'sustainable-catalyst-feature-suggestions'))) . '</h3>' . ($active_product ? '<p>' . esc_html($active_product['description']) . '</p>' : '') . '</div><span data-scfs-result-count>' . esc_html(sprintf(_n('%d result', '%d results', count($results), 'sustainable-catalyst-feature-suggestions'), count($results))) . '</span></header>';
+        echo '<header class="scfs-kb-library-results-header"><div><p class="scfs-kb-eyebrow">' . esc_html__('Support Articles', 'sustainable-catalyst-feature-suggestions') . '</p><h3>' . esc_html($area !== '' ? $navigation['areas'][$area]['label'] : ($active_product ? $active_product['name'] : __('All products', 'sustainable-catalyst-feature-suggestions'))) . '</h3>' . ($active_product ? '<p>' . esc_html($active_product['description']) . '</p>' : '') . '</div><span data-scfs-result-count>' . esc_html(sprintf(_n('%d result', '%d results', $result_total, 'sustainable-catalyst-feature-suggestions'), $result_total)) . '</span></header>';
 
         echo '<form class="scfs-kb-library-search" method="get" action="' . esc_url($action) . '" role="search" data-scfs-discovery-form><input type="hidden" name="scfs_kb_product" value="' . esc_attr($product_filter) . '"><input type="hidden" name="scfs_kb_version" value="' . esc_attr($version_filter) . '"><input type="hidden" name="scfs_kb_section" value="' . esc_attr($selected_section) . '"><label class="scfs-kb-library-search-main"><span>' . esc_html__('Search', 'sustainable-catalyst-feature-suggestions') . '</span><input type="search" name="scfs_kb_search" value="' . esc_attr($search) . '" placeholder="' . esc_attr__('Search tasks, features, examples, versions, and error messages', 'sustainable-catalyst-feature-suggestions') . '" autocomplete="off" data-scfs-discovery-search><small>' . esc_html__('Press / anywhere in the browser to focus search. Press Escape to clear.', 'sustainable-catalyst-feature-suggestions') . '</small></label><div class="scfs-kb-library-filter-grid">';
         echo '<input type="hidden" name="scfs_kb_area" value="' . esc_attr($area) . '">';
@@ -1176,9 +1078,17 @@ final class SCFS_Integrated_Knowledge_Base {
         if ($area !== '') echo '<p class="scfs-kb-area-context">' . esc_html($navigation['areas'][$area]['label'] . ': ' . $navigation['areas'][$area]['description']) . '</p>';
         echo '<div class="scfs-kb-library-results-list" data-scfs-discovery-results>';
         if (!$results && $area !== '') echo '<p>Documentation in preparation. No published articles match this research area and the selected filters.</p>';
-        elseif (!$results) $this->render_no_results_recovery($action, $base_args, $all_posts);
+        elseif (!$results) $this->render_no_results_recovery($action, $base_args, array());
         else foreach ($results as $post) $this->render_library_article_row($post);
-        echo '</div></div></div></section>';
+        echo '</div>';
+        if ($query->max_num_pages > 1) {
+            echo '<nav class="scfs-kb-pagination" aria-label="Article result pages">';
+            if ($page > 1) { $args = $base_args; $args['scfs_kb_page'] = $page - 1; echo '<a rel="prev" href="' . esc_url($this->browser_url($action, $args)) . '">Previous page</a>'; }
+            echo '<span aria-current="page">' . esc_html(sprintf(__('Page %1$d of %2$d', 'sustainable-catalyst-feature-suggestions'), $page, $query->max_num_pages)) . '</span>';
+            if ($page < $query->max_num_pages) { $args = $base_args; $args['scfs_kb_page'] = $page + 1; echo '<a rel="next" href="' . esc_url($this->browser_url($action, $args)) . '">Next page</a>'; }
+            echo '</nav>';
+        }
+        echo '</div></div></section>';
         return ob_get_clean();
     }
 
@@ -1318,9 +1228,9 @@ final class SCFS_Integrated_Knowledge_Base {
         echo '<div class="wrap"><h1>' . esc_html__('Integrated Knowledge Base', 'sustainable-catalyst-feature-suggestions') . '</h1><p>' . esc_html__('A first-party, expandable product documentation library integrated with Support Articles, Known Issues, Guided Resolution, and visitor usefulness ratings.', 'sustainable-catalyst-feature-suggestions') . '</p>';
         echo '<div class="scfs-kb-modern-stats"><span><strong>' . esc_html((string) $validation['articles']) . '</strong> bundled articles</span><span><strong>' . esc_html((string) $validation['products']) . '</strong> products</span><span><strong>' . esc_html((string) $validation['samples']) . '</strong> samples</span><span><strong>' . esc_html((string) $published) . '</strong> published records</span></div>';
         if (!$validation['ok']) echo '<div class="notice notice-error"><p>' . esc_html(implode(' ', $validation['errors'])) . '</p></div>';
-        echo '<div class="card" style="max-width:900px"><h2>' . esc_html__('Import or repair documentation', 'sustainable-catalyst-feature-suggestions') . '</h2><p>' . esc_html__('Creates missing guides, repairs folder and taxonomy assignments, publishes imported records, preserves manually edited article bodies, and restores Support Center visibility.', 'sustainable-catalyst-feature-suggestions') . '</p><form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="scfs_kb510_import">';
+        echo '<div class="card" style="max-width:900px"><h2>' . esc_html__('Import or repair documentation', 'sustainable-catalyst-feature-suggestions') . '</h2><p>' . esc_html__('Legacy import is disabled. Use Knowledge Base Content Updates for an explicit preview and review-only installation. Existing articles and editorial states are preserved.', 'sustainable-catalyst-feature-suggestions') . '</p><form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="scfs_kb510_import">';
         wp_nonce_field('scfs_kb510_import');
-        echo '<button class="button button-primary" ' . disabled(!$validation['ok'], true, false) . '>' . esc_html__('Import or Repair 96 Guides', 'sustainable-catalyst-feature-suggestions') . '</button></form></div>';
+        echo '<button class="button button-primary" ' . disabled(!$validation['ok'], true, false) . '>' . esc_html__('Open Review-only Content Updates', 'sustainable-catalyst-feature-suggestions') . '</button></form></div>';
         if ($report) echo '<div class="card" style="max-width:900px"><h2>' . esc_html__('Last report', 'sustainable-catalyst-feature-suggestions') . '</h2><pre style="white-space:pre-wrap">' . esc_html(wp_json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . '</pre></div>';
         echo '</div>';
     }
@@ -1328,13 +1238,7 @@ final class SCFS_Integrated_Knowledge_Base {
     public function handle_import() {
         if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'sustainable-catalyst-feature-suggestions'));
         check_admin_referer('scfs_kb510_import');
-        $report = $this->import_documentation('publish');
-        update_option(self::REPORT_OPTION, $report, false);
-        if (!empty($report['ok'])) {
-            update_option(self::IMPORT_OPTION, self::CONTENT_VERSION, false);
-            flush_rewrite_rules(false);
-        }
-        wp_safe_redirect(admin_url('edit.php?post_type=' . Sustainable_Catalyst_Feature_Suggestions::POST_TYPE . '&page=' . self::ADMIN_PAGE));
+        wp_safe_redirect(admin_url('edit.php?post_type=' . Sustainable_Catalyst_Feature_Suggestions::POST_TYPE . '&page=scfs-kb-content-updates'));
         exit;
     }
 }

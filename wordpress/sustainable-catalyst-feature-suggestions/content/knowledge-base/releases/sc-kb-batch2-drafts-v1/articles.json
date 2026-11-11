@@ -1,0 +1,438 @@
+[
+  {
+    "id": "workbench-root-diagnostics",
+    "title": "Workbench: solve a bracketed root and inspect convergence",
+    "slug": "workbench-root-diagnostics",
+    "summary": "Find the positive square root of two with the registered numerical solver and retain the residual and execution record.",
+    "product_slug": "workbench",
+    "research_areas": [
+      "scientific-computing"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Find the positive square root of two with the registered numerical solver and retain the residual and execution record.</p><p>This guide describes inspected source at commit <code>7f7c23fd609386619f95ba9a4f932bbdca097b3b</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<p><strong>Current source limitation:</strong> the full backend application cannot be imported at the audited revision because <code>app.main</code> imports missing <code>app.v10110</code>. The supplied direct-module solver fixtures pass locally, but the API procedure below is pending until this launch blocker is fixed and route tests pass. Do not describe these endpoints as production verified.</p><h2>Beginner: prepare and run the example</h2><p>A root is a value making an expression equal zero. A bracket is a lower and upper bound enclosing a sign change. This example is dimensionless: write x\u00b2 \u2212 2 = 0, using the positive interval [0, 2]. It does not find every root of the expression.</p><ol><li>Use an isolated Workbench backend checkout at the cited revision. Ask the administrator to confirm its service URL and required service-token policy; do not send credentials to an unverified address.</li><li>Read <code>GET /solvers/catalog</code> and confirm <code>root.brentq</code> exists. The catalog is the source of supported solver names.</li><li>Submit the supplied root request to <code>POST /solvers/solve</code>. It uses <code>problemKind: root</code>, <code>solverKey: root.brentq</code>, and <code>problem: {expression: x**2-2, variable: x, bracket: [0,2], tolerance: 1e-10}</code>.</li><li>Inspect <code>diagnostics.converged</code>, <code>absoluteResidual</code>, <code>toleranceSatisfied</code> and the returned <code>solverRunHash</code>. Preserve the full result, including the nested orchestration and execution object.</li><li>Compare the numerical root with \u221a2, approximately 1.4142135623730951. The source regression expects the absolute residual to be below 1e-8. A finite displayed value alone is insufficient evidence of convergence.</li></ol>\n<h2>Researcher: method and interpretation</h2><p>A bracketing solver depends on the function behaving appropriately over the bracket. A sign change may arise across a discontinuity, so inspect the equation rather than treating the bracket as proof. The residual |x\u00b2\u22122| measures equation error; it is not the same as uncertainty in a measured input or guaranteed error in x. Retain both tolerance and residual. For quantities with units, first define a consistent nondimensional model; do not put heterogeneous physical units into this scalar expression.</p><p>Compare a second solver or an analytic reference before using a result in a scientific report. The runtime explicitly bounds execution: arbitrary Python and dynamic imports are not authorized by this interface. A hash detects certain content changes; it does not establish scientific validity.</p>\n<h2>Developer: contracts and failure recovery</h2><p><code>SolverRequest</code> validates registered solver keys and their problem families. Pairing <code>ode.rk45</code> with a root request must be rejected rather than silently choosing another method. A malformed expression or missing valid bracket should be investigated as input/solver failure. Preserve the validation response and correct the request; do not discard diagnostics. The result schema is <code>sc-workbench-numerical-solver-result/1.0</code>. Core-lineage planning is a separate two-phase operation and is not implicit remote delivery.</p>\n<h2>Common mistakes and next action</h2><p>Do not interpret the positive root as a complete solution set; the negative root lies outside the bracket. Do not label convergence as experimental verification. After this example passes, use the integration guide to examine accuracy through refinement and keep both acceptance receipts with the project.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;problemKind&quot;: &quot;root&quot;,\n  &quot;solverKey&quot;: &quot;root.brentq&quot;,\n  &quot;problem&quot;: {\n    &quot;expression&quot;: &quot;x**2-2&quot;,\n    &quot;variable&quot;: &quot;x&quot;,\n    &quot;bracket&quot;: [\n      0,\n      2\n    ],\n    &quot;tolerance&quot;: 1e-10\n  },\n  &quot;requestKey&quot;: &quot;kb-sqrt2&quot;\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/app/v740.py\">backend/app/v740.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/tests/test_numerical_methods_solver_runtime_v740.py\">backend/tests/test_numerical_methods_solver_runtime_v740.py</a></li></ul><p>Fixture: <code>workbench-root.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/app/v740.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/tests/test_numerical_methods_solver_runtime_v740.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "workbench-root.json",
+    "related": [
+      "workbench-integration-refinement",
+      "workbench-linear-residuals"
+    ],
+    "content_sha256": "839c22502daa7ccffcc921e0d073613fdf40f4d606d06d4b4bb242c80c88cb49",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "workbench-integration-refinement",
+    "title": "Workbench: integrate a function and perform a refinement check",
+    "slug": "workbench-integration-refinement",
+    "summary": "Integrate a simple function with an analytic reference, then compare a composite quadrature refinement study without claiming scientific convergence certification.",
+    "product_slug": "workbench",
+    "research_areas": [
+      "scientific-computing"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Integrate a simple function with an analytic reference, then compare a composite quadrature refinement study without claiming scientific convergence certification.</p><p>This guide describes inspected source at commit <code>7f7c23fd609386619f95ba9a4f932bbdca097b3b</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<p><strong>Current source limitation:</strong> the full backend application cannot be imported at the audited revision because <code>app.main</code> imports missing <code>app.v10110</code>. The supplied direct-module solver fixtures pass locally, but the API procedure below is pending until this launch blocker is fixed and route tests pass. Do not describe these endpoints as production verified.</p><h2>Beginner: terms and numbered procedure</h2><p>A definite integral accumulates a function over a specified interval. Quadrature is its numerical approximation. Use the synthetic dimensionless function x\u00b2 over [0,1], whose exact integral is 1/3. If the integrand carries units U and x carries units V, the integral carries units U\u00b7V; this example deliberately avoids mixed-unit inputs.</p><ol><li>Confirm the backend revision and <code>GET /solvers/catalog</code> in an isolated environment.</li><li>Send the supplied integration request to <code>POST /solvers/solve</code>, using <code>problemKind: integration</code> and <code>problem: {expression: x**2, lower: 0, upper: 1}</code>. The current default is the registered adaptive integration solver.</li><li>Inspect the returned nested execution value, method and <code>estimatedAbsoluteError</code>. The source test compares the value to 1/3 within 1e-8.</li><li>Run the second fixture against <code>POST /solvers/convergence-study</code>: integrate sin(x) from 0 to \u03c0 using <code>integration.simpson</code>, 21 initial samples and three levels.</li><li>Compare every level rather than only the final display. The final primary value should approach 2 within 1e-5 in the source regression. Store the level table and <code>studyHash</code>.</li></ol>\n<h2>Researcher: what refinement does and does not establish</h2><p>A smaller grid spacing may reduce discretization error for sufficiently smooth functions, but repeated agreement alone does not certify a model. Singularities, oscillations, cancellation and discontinuities can mislead quadrature. Split troublesome intervals and choose a method with appropriate assumptions. An estimated absolute error can be absent for some methods; absence is not a zero-error result.</p><p>The convergence-study response explicitly records <code>scientificConvergenceCertified: false</code>. Retain this limitation when exporting results. Numerical convergence concerns the approximation to the stated mathematical problem; physical validity additionally depends on the model, measured inputs and boundary conditions. Independent scientific review remains necessary for a real research claim.</p>\n<h2>Developer and administrator reference</h2><p><code>ConvergenceStudyRequest</code> supports root, integration, differentiation and ODE studies. The inspected limit is two to eight levels and a refinement factor greater than one and at most ten. Do not substitute unsupported problem families. Keep solver names version-pinned because method selection normalizes fields in the validated problem before orchestration.</p><p>For a failed study, preserve the original request and per-level error, reduce the example to a smooth reference function, and compare a single solve first. Do not automatically retry expensive studies against production. These API steps do not verify the browser's graph controls or an external computational provider.</p>\n<h2>Expected output and next action</h2><p>The useful output is a method-specific numerical value, diagnostic context and an auditable level history. Add a plot of value versus refinement level only after validating the table; label axes and reference line. Figure creation and browser export remain unverified by this guide.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;single&quot;: {\n    &quot;problemKind&quot;: &quot;integration&quot;,\n    &quot;problem&quot;: {\n      &quot;expression&quot;: &quot;x**2&quot;,\n      &quot;lower&quot;: 0,\n      &quot;upper&quot;: 1\n    }\n  },\n  &quot;study&quot;: {\n    &quot;problemKind&quot;: &quot;integration&quot;,\n    &quot;solverKey&quot;: &quot;integration.simpson&quot;,\n    &quot;problem&quot;: {\n      &quot;expression&quot;: &quot;sin(x)&quot;,\n      &quot;lower&quot;: 0,\n      &quot;upper&quot;: 3.141592653589793,\n      &quot;samples&quot;: 21\n    },\n    &quot;levels&quot;: 3\n  }\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/app/v740.py\">backend/app/v740.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/tests/test_numerical_methods_solver_runtime_v740.py\">backend/tests/test_numerical_methods_solver_runtime_v740.py</a></li></ul><p>Fixture: <code>workbench-integration.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/app/v740.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/tests/test_numerical_methods_solver_runtime_v740.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "workbench-integration.json",
+    "related": [
+      "workbench-root-diagnostics",
+      "workbench-linear-residuals"
+    ],
+    "content_sha256": "4cd56859994b2b0fa29b619cea68b3343766c06965168a3c4e270480c191dab3",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "workbench-linear-residuals",
+    "title": "Workbench: solve a linear system and interpret residuals",
+    "slug": "workbench-linear-residuals",
+    "summary": "Solve a two-equation system and distinguish a small numerical residual from a well-conditioned scientific model.",
+    "product_slug": "workbench",
+    "research_areas": [
+      "scientific-computing"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Solve a two-equation system and distinguish a small numerical residual from a well-conditioned scientific model.</p><p>This guide describes inspected source at commit <code>7f7c23fd609386619f95ba9a4f932bbdca097b3b</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<p><strong>Current source limitation:</strong> the full backend application cannot be imported at the audited revision because <code>app.main</code> imports missing <code>app.v10110</code>. The supplied direct-module solver fixtures pass locally, but the API procedure below is pending until this launch blocker is fixed and route tests pass. Do not describe these endpoints as production verified.</p><h2>Beginner: the problem in plain language</h2><p>A linear system represents several linear equations that must hold together. For the synthetic dimensionless system 3x + y = 9 and x + 2y = 8, the exact solution is x=2 and y=3. Matrix notation writes A\u00b7z=b, with A=[[3,1],[1,2]], z=[x,y] and b=[9,8]. Row and column order matter.</p><ol><li>Confirm the local backend and registered <code>linear.solve</code> method in the solver catalog.</li><li>Submit the supplied fixture to <code>POST /solvers/solve</code>, with <code>problemKind: linear-algebra</code>, <code>solverKey: linear.solve</code> and the matrix/vector under <code>problem</code>.</li><li>Locate the nested execution solution and verify its variable order. Substitute [2,3] back into both equations: [3\u00b72+3, 2+2\u00b73]=[9,8].</li><li>Read <code>diagnostics.residualNorm</code>, <code>conditionNumber</code>, <code>illConditioned</code>, shape and rank where returned. The source regression expects a residual norm below 1e-10 for this reference.</li><li>Save the matrix, right-hand side, solver key, result hash and complete response together. A screenshot without inputs is not a reproducibility record.</li></ol>\n<h2>Researcher: error, conditioning and units</h2><p>The residual is r=A\u00b7z\u2212b. A small norm means the calculated solution nearly satisfies these equations. It does not guarantee a small error in the unknowns if the problem is ill-conditioned. The inspected diagnostic flags condition numbers of at least 1e12 as ill-conditioned; that threshold is a software warning, not a universal acceptability rule.</p><p>In a physical model, each equation must be dimensionally consistent and variable scaling must be justified. Large differences in coefficient scale can worsen numerical interpretation. Record transformations and convert the result back to the original units. Perturb inputs within plausible measurement uncertainty and inspect sensitivity before drawing conclusions. The solver does not infer measurement uncertainty from the matrix.</p>\n<h2>Developer: interface and validation</h2><p>The canonical request selects a registered problem family, then validates with the family model. Solver-family mismatch must be rejected. A singular or malformed matrix must remain a failure or an explicitly unsupported case, rather than being silently replaced by inverse or least-squares operations. <code>linear.least-squares</code>, eigen-analysis and SVD are separate catalog methods with distinct mathematical meanings.</p><p>Regression tests should include the exact reference above and failure cases, not only the presence of a result key. A persisted execution object helps trace the request but is not evidence of successful Core dispatch. Use the separately governed lineage plan if integrating with other applications.</p>\n<h2>Troubleshooting and next action</h2><p>Unexpected values often come from transposing coefficients, reversing the vector or comparing rounded displays. Inspect the full-precision response and recompute A\u00b7z. If rank is deficient, revisit the model and constraints. Do not report a unique solution unless the system and method justify it.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;problemKind&quot;: &quot;linear-algebra&quot;,\n  &quot;solverKey&quot;: &quot;linear.solve&quot;,\n  &quot;problem&quot;: {\n    &quot;matrix&quot;: [\n      [\n        3,\n        1\n      ],\n      [\n        1,\n        2\n      ]\n    ],\n    &quot;vector&quot;: [\n      9,\n      8\n    ]\n  }\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/app/v740.py\">backend/app/v740.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-workbench/blob/7f7c23fd609386619f95ba9a4f932bbdca097b3b/backend/tests/test_numerical_methods_solver_runtime_v740.py\">backend/tests/test_numerical_methods_solver_runtime_v740.py</a></li></ul><p>Fixture: <code>workbench-linear.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/app/v740.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+        "commit": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+        "path": "backend/tests/test_numerical_methods_solver_runtime_v740.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "workbench-linear.json",
+    "related": [
+      "workbench-root-diagnostics",
+      "workbench-integration-refinement"
+    ],
+    "content_sha256": "09371f84b43293031254f6ee8d0b2953ce8f4e8a1ea75b375041c6a0928d2528",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "site-area-of-interest",
+    "title": "Site Intelligence: define and validate an area of interest",
+    "slug": "site-area-of-interest",
+    "summary": "Define a synthetic WGS84 area with explicit coordinate order, visibility and geometric limitations before performing spatial analysis.",
+    "product_slug": "site-intelligence",
+    "research_areas": [
+      "discovery-sources"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Define a synthetic WGS84 area with explicit coordinate order, visibility and geometric limitations before performing spatial analysis.</p><p>This guide describes inspected source at commit <code>43660fb002e7d892442473dfd323dbab4f6fd68e</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: prepare the area</h2><p>An area of interest is the geographic region used to select evidence. This spatial-evidence implementation accepts bounding boxes, polygons and radius areas. Coordinates use longitude first, latitude second, in WGS84 / EPSG:4326. A bounding box is [west, south, east, north], not a pair of latitude-longitude points.</p><ol><li>Use an isolated checkout with a temporary storage root and the version-matched spatial policy and layer catalog. The accompanying fixture runner constructs this environment without contacting live sources.</li><li>Create a bounding-box request with <code>area_id: city</code>, <code>mode: bbox</code>, <code>bbox: [-88,41,-87,42]</code> and explicit <code>visibility: public</code> only for this synthetic example.</li><li>Call the local <code>SpatialEvidenceStudio.create_area</code> method. The documented API registration also includes <code>POST /admin/spatial/areas</code>; its actual deployed authorization and availability remain unverified here.</li><li>Inspect the normalized area, geometry, bounds and approximate area. Confirm longitude values near \u221288 and latitude values near 41 before attaching data.</li><li>Read back the area from the temporary store and preserve its ID and complete geometry with the study. Do not reuse a public visibility setting for private field locations.</li></ol>\n<h2>Researcher: spatial assumptions</h2><p>A rectangle is an analytical selection boundary, not an administrative or ecological boundary. A radius area's distance is in kilometers; angular degrees are not kilometers. The source uses spherical-distance calculations with a mean Earth radius of 6371.0088 km for relevant operations. Approximate area is not a cadastral survey or high-precision geodesic certificate.</p><p>For polygons, use a closed ring and validate the intended topology. Investigations near the antimeridian or poles require additional review because simple bounding-box predicates may not express the intended region. Coordinate reference transformation is not performed merely by labeling coordinates WGS84. Reproject externally with a documented method when needed and retain the original CRS and transformation provenance.</p>\n<h2>Developer and operational reference</h2><p><code>SpatialEvidenceStudio</code> resolves policy/catalog/storage paths from Settings and requires the spatial-evidence policy schema. A missing or wrong schema raises an error; do not create an empty policy to bypass validation. Use separate temporary paths for areas, datasets and analyses in tests. Local writes are JSON/JSONL storage operations, not a platform-wide research-object transaction.</p><p>The source tests cover bbox, polygon and radius modes and public-area filtering. They also exercise intersection and proximity separately. A source route test does not prove production access controls; deployment and permission acceptance must be recorded independently.</p>\n<h2>Common mistakes and next action</h2><p>Swapped coordinates may create a plausible but wrong area. Inspect bounds before interpretation. An empty intersection can be caused by wrong CRS, wrong coordinate order or genuinely absent records. After validation, register the synthetic dataset and compare expected feature IDs before using real evidence.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;area&quot;: {\n    &quot;area_id&quot;: &quot;city&quot;,\n    &quot;mode&quot;: &quot;bbox&quot;,\n    &quot;bbox&quot;: [\n      -88,\n      41,\n      -87,\n      42\n    ],\n    &quot;visibility&quot;: &quot;public&quot;\n  },\n  &quot;dataset&quot;: {\n    &quot;dataset_id&quot;: &quot;observations&quot;,\n    &quot;source&quot;: &quot;Synthetic KB fixture, not observed measurements&quot;,\n    &quot;visibility&quot;: &quot;public&quot;,\n    &quot;feature_collection&quot;: {\n      &quot;type&quot;: &quot;FeatureCollection&quot;,\n      &quot;features&quot;: [\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;inside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.63,\n              41.88\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 10,\n            &quot;api_token&quot;: &quot;SYNTHETIC-NOT-A-SECRET&quot;\n          }\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;missing&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.7,\n              41.9\n            ]\n          },\n          &quot;properties&quot;: {}\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;outside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -90,\n              40\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 100\n          }\n        }\n      ]\n    }\n  }\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/app/spatial_evidence_v2150.py\">backend/app/spatial_evidence_v2150.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py\">backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py</a></li></ul><p>Fixture: <code>site-spatial.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/app/spatial_evidence_v2150.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "site-spatial.json",
+    "related": [
+      "site-register-versioned-geojson",
+      "site-aggregate-without-imputation"
+    ],
+    "content_sha256": "19a8b68c10702a8dac6d62686f12bc8283127c0ddeb9ec173d92160589df728e",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "site-register-versioned-geojson",
+    "title": "Site Intelligence: register GeoJSON with provenance and deduplication",
+    "slug": "site-register-versioned-geojson",
+    "summary": "Register a small synthetic FeatureCollection, inspect redaction and detect unchanged inputs without treating sample records as real observations.",
+    "product_slug": "site-intelligence",
+    "research_areas": [
+      "data-research-objects"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Register a small synthetic FeatureCollection, inspect redaction and detect unchanged inputs without treating sample records as real observations.</p><p>This guide describes inspected source at commit <code>43660fb002e7d892442473dfd323dbab4f6fd68e</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: what a spatial dataset contains</h2><p>A GeoJSON FeatureCollection contains features, each with a geometry and properties. A stable feature ID identifies the same entity across versions; its row position does not. This example uses three synthetic points, two inside the study box and one outside. No point describes a real person or field observation.</p><ol><li>Validate the area in the preceding guide. Use a temporary spatial-evidence store.</li><li>Open the supplied FeatureCollection and check <code>type: FeatureCollection</code>, a list of Features, Point coordinates in longitude-latitude order, explicit feature IDs and numeric score properties where available.</li><li>Call <code>register_dataset</code> with a stable <code>dataset_id</code>, a title, source description, visibility and the FeatureCollection. The source also registers <code>POST /admin/spatial/datasets/register</code>; deployment and account permissions require separate acceptance.</li><li>Submit the identical request again. The inspected deduplication test expects an unchanged, deduplicated result instead of a second equivalent registration.</li><li>Inspect the saved normalized payload. The fixture's property named <code>api_token</code> must be replaced with a redacted marker. Never use a real token to test this behavior.</li><li>Retain the returned dataset/version identity and source context. Change an actual feature value for a distinct-version exercise; do not mutate saved files directly.</li></ol>\n<h2>Researcher: identity, rights and data quality</h2><p>Stable IDs allow a comparison to distinguish added, removed and changed entities. Without them, row reordering may be mistaken for an entity change. A source label and content hash preserve context but do not prove source reliability, ownership or licensing. Check rights before importing real data, preserve the original artifact and state whether values are observations, modeled quantities or synthetic examples.</p><p>The normalizer redacts selected sensitive property-key patterns, but this is not comprehensive anonymization. Sensitive information can remain in titles, geometry, free text or fields with unexpected names. Public visibility therefore requires a separate privacy review. Exact point locations can reveal restricted sites even without names.</p>\n<h2>Developer: limits, validation and recovery</h2><p>The implementation validates GeoJSON structure, supported coordinate positions, maximum feature count and maximum canonical payload bytes using configured settings. Large collections should fail explicitly rather than be partially accepted. Test malformed geometry and oversize requests before scaling. The redaction pattern includes token, secret, password, authorization, API-key, email, phone and user-ID terms.</p><p>Registration persists a normalized payload and metadata. Back up the temporary store before version experiments. If a request unexpectedly deduplicates, compare the normalized content and recorded source/time fields instead of assuming raw JSON whitespace creates a version. Hash equality is not scientific equality.</p>\n<h2>Troubleshooting and next action</h2><p>Missing numeric scores must stay missing. Do not use zero to mean unknown. After registration, run intersection and aggregation and verify the two selected IDs and the explicit missing-metric count.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;area&quot;: {\n    &quot;area_id&quot;: &quot;city&quot;,\n    &quot;mode&quot;: &quot;bbox&quot;,\n    &quot;bbox&quot;: [\n      -88,\n      41,\n      -87,\n      42\n    ],\n    &quot;visibility&quot;: &quot;public&quot;\n  },\n  &quot;dataset&quot;: {\n    &quot;dataset_id&quot;: &quot;observations&quot;,\n    &quot;source&quot;: &quot;Synthetic KB fixture, not observed measurements&quot;,\n    &quot;visibility&quot;: &quot;public&quot;,\n    &quot;feature_collection&quot;: {\n      &quot;type&quot;: &quot;FeatureCollection&quot;,\n      &quot;features&quot;: [\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;inside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.63,\n              41.88\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 10,\n            &quot;api_token&quot;: &quot;SYNTHETIC-NOT-A-SECRET&quot;\n          }\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;missing&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.7,\n              41.9\n            ]\n          },\n          &quot;properties&quot;: {}\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;outside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -90,\n              40\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 100\n          }\n        }\n      ]\n    }\n  }\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/app/spatial_evidence_v2150.py\">backend/app/spatial_evidence_v2150.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py\">backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py</a></li></ul><p>Fixture: <code>site-spatial.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/app/spatial_evidence_v2150.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "site-spatial.json",
+    "related": [
+      "site-area-of-interest",
+      "site-aggregate-without-imputation"
+    ],
+    "content_sha256": "89480a9617910fd0d01384d405bd0faca0ed01588acf2e7cfad7d78db4532ac1",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "site-aggregate-without-imputation",
+    "title": "Site Intelligence: intersect an area and aggregate without imputation",
+    "slug": "site-aggregate-without-imputation",
+    "summary": "Compute a source-aware spatial summary and explain why a missing value must not silently become a zero.",
+    "product_slug": "site-intelligence",
+    "research_areas": [
+      "analysis-decisions"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Compute a source-aware spatial summary and explain why a missing value must not silently become a zero.</p><p>This guide describes inspected source at commit <code>43660fb002e7d892442473dfd323dbab4f6fd68e</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: follow the synthetic study</h2><p>Intersection selects features that meet the area relationship. Aggregation summarizes a property over those matches. The fixture has one inside point with score 10, another inside point without a score, and an outside point with score 100. The expected selection contains two features, but only one contributes a numeric score.</p><ol><li>Create the city area and register the fixture dataset as described in the preceding guides.</li><li>Call <code>intersection(\"city\", \"observations\", public=True)</code> against the temporary store. Confirm <code>matched_feature_count</code> equals 2 and inspect the matched feature IDs.</li><li>Call <code>aggregate(\"city\", \"observations\", metric=\"score\", public=True)</code>. Confirm <code>feature_count</code> is 2, mean is 10, <code>missing_metric_count</code> is 1 and <code>imputation_applied</code> is false.</li><li>Explain the arithmetic: 10 divided by one numeric observation equals 10. Dividing by two or substituting zero would produce 5 and would represent a different, unjustified analysis.</li><li>Export the evidence packet only after confirming that both the area and dataset are public. The source's public export test checks packet checksum, CSV and GeoJSON context.</li></ol>\n<h2>Researcher: interpretation and spatial limits</h2><p>The mean is conditional on matched features with available numeric measurements. Missingness may be systematic; the software's no-imputation choice does not remove selection bias. Report matched count, numeric count, missing count, units and collection method. This example's score is dimensionless and has no environmental meaning.</p><p>Spatial overlap does not establish exposure, causality or impact. Point proximity can use exact point distance, while non-point features may use an approximation explicitly labeled by the implementation. Do not equate a line's representative position with a measured minimum distance to the entire geometry. Temporal comparability also requires matching observation dates and definitions, not just location.</p>\n<h2>Developer: methods and acceptance</h2><p>The source includes segment-aware line/polygon intersection tests, point-distance checks and version comparison with stable IDs. Keep those operations distinct in API documentation. The area/dataset visibility checks are separate from live account authorization. Local source acceptance should retain selected IDs and raw metrics, not only a rendered map.</p><p>Unexpected counts should be diagnosed from geometry validation, CRS, feature identity and visibility first. Never repair a failing acceptance test by altering the scientific reference result. For an empty numeric population, preserve missingness and inspect the actual response rather than inventing a zero-valued summary.</p>\n<h2>Publication and next step</h2><p>A packet checksum supports artifact integrity; it does not approve publication or validate the scientific interpretation. Review provenance, geometry sensitivity, licensing and methodology before a report. The cross-application handoff to Workspace or Research Hub remains unverified by this local example and must not be described as completed.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;area&quot;: {\n    &quot;area_id&quot;: &quot;city&quot;,\n    &quot;mode&quot;: &quot;bbox&quot;,\n    &quot;bbox&quot;: [\n      -88,\n      41,\n      -87,\n      42\n    ],\n    &quot;visibility&quot;: &quot;public&quot;\n  },\n  &quot;dataset&quot;: {\n    &quot;dataset_id&quot;: &quot;observations&quot;,\n    &quot;source&quot;: &quot;Synthetic KB fixture, not observed measurements&quot;,\n    &quot;visibility&quot;: &quot;public&quot;,\n    &quot;feature_collection&quot;: {\n      &quot;type&quot;: &quot;FeatureCollection&quot;,\n      &quot;features&quot;: [\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;inside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.63,\n              41.88\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 10,\n            &quot;api_token&quot;: &quot;SYNTHETIC-NOT-A-SECRET&quot;\n          }\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;missing&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -87.7,\n              41.9\n            ]\n          },\n          &quot;properties&quot;: {}\n        },\n        {\n          &quot;type&quot;: &quot;Feature&quot;,\n          &quot;id&quot;: &quot;outside&quot;,\n          &quot;geometry&quot;: {\n            &quot;type&quot;: &quot;Point&quot;,\n            &quot;coordinates&quot;: [\n              -90,\n              40\n            ]\n          },\n          &quot;properties&quot;: {\n            &quot;score&quot;: 100\n          }\n        }\n      ]\n    }\n  }\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/app/spatial_evidence_v2150.py\">backend/app/spatial_evidence_v2150.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-site-intelligence/blob/43660fb002e7d892442473dfd323dbab4f6fd68e/backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py\">backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py</a></li></ul><p>Fixture: <code>site-spatial.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/app/spatial_evidence_v2150.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+        "commit": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+        "path": "backend/tests/test_geospatial_analysis_spatial_evidence_v2150.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "site-spatial.json",
+    "related": [
+      "site-area-of-interest",
+      "site-register-versioned-geojson"
+    ],
+    "content_sha256": "f7c40163766c85183348c2539e3bdbf770bb38425fef429cda86af16c4bb905c",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "lab-design-validate-protocol",
+    "title": "Research Lab: write and validate an experiment protocol",
+    "slug": "lab-design-validate-protocol",
+    "summary": "Turn a synthetic question into a structured protocol with variables, controls, a procedure and a prespecified analysis plan.",
+    "product_slug": "research-lab",
+    "research_areas": [
+      "research-projects"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Turn a synthetic question into a structured protocol with variables, controls, a procedure and a prespecified analysis plan.</p><p>This guide describes inspected source at commit <code>39fdefb3ff9cc73262b7d748cb44d2599094ae5a</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: define the research question</h2><p>A protocol describes what will be done before examining outcomes. A hypothesis is a testable expectation; an independent variable is deliberately varied or compared, and a dependent variable is measured. The synthetic example asks whether changing light intensity changes growth within a chosen range. It is a software demonstration, not a plant-growth recommendation or a completed experiment.</p><ol><li>Read the provided protocol fixture. It declares objective, hypothesis, design type, light as an independent variable and growth as a dependent variable, with explicit units.</li><li>Specify a control condition, measurement procedure and analysis plan. Do not put a result in the hypothesis or invent a source reference. The fixture uses an explicitly synthetic source ID.</li><li>Run the local <code>normalize_protocol</code> method, then <code>validate_protocol</code>. Inspect the normalized variables and ordered procedure, not only the score.</li><li>Review every blocking issue and warning. Removing the dependent variable or analysis plan must prevent readiness. A missing independent variable can be a warning rather than a hard failure.</li><li>Save the normalized protocol with its <code>protocolHash</code> and source revision. Verify the saved record with <code>verify({record: protocol})</code> before comparing runs.</li></ol>\n<h2>Researcher: design and limitations</h2><p>The readiness score subtracts penalties for missing required sections and warnings. It measures structural completeness, not design quality, statistical power, ethics approval or causal identification. Randomized-controlled designs additionally require a documented randomization method for their warning check; entering text does not execute random assignment.</p><p>Choose independent experimental units, avoid pseudoreplication and specify inclusion/exclusion rules before analyzing outcomes. If multiple plants share a chamber, the chamber may be the experimental unit. Record measurement resolution and calibration. The supplied growth values do not establish a biological effect and should never appear as observed evidence.</p>\n<h2>Developer: source contract</h2><p>The protocol schema is <code>sc-lab-experiment-protocol/0.30.0</code>, even though the overall application may have a later release number. Limits in this module are 100 variables and 200 procedure steps. Normalization truncates bounded lists and text, so inspect the saved record for unintended truncation. Supported policy lists are discoverable with <code>policies()</code>.</p><p><code>health()</code> explicitly states <code>arbitraryCode: false</code> and <code>serverBackedRegistry: false</code>. This module builds records; it does not itself establish durable platform persistence or execute a laboratory procedure. Keep a separate protected file or application persistence receipt. Created timestamps affect hashes, so rerunning an unfixed raw payload need not produce an identical protocol hash.</p>\n<h2>Troubleshooting and next action</h2><p>When readiness fails, correct missing fields and rerun validation. Do not remove warnings from the output. If a hash check fails, retain both records and find changed fields. Proceed to the replication guide only with the same intentionally frozen protocol context and explicit run results.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;protocol&quot;: {\n    &quot;title&quot;: &quot;Synthetic light response protocol&quot;,\n    &quot;domain&quot;: &quot;demonstration&quot;,\n    &quot;designType&quot;: &quot;controlled&quot;,\n    &quot;objective&quot;: &quot;Demonstrate structured records, not a biological conclusion.&quot;,\n    &quot;hypothesis&quot;: &quot;Light treatment changes the synthetic growth metric within the defined range.&quot;,\n    &quot;variables&quot;: [\n      {\n        &quot;name&quot;: &quot;light&quot;,\n        &quot;role&quot;: &quot;independent&quot;,\n        &quot;unit&quot;: &quot;umol m-2 s-1&quot;\n      },\n      {\n        &quot;name&quot;: &quot;growth&quot;,\n        &quot;role&quot;: &quot;dependent&quot;,\n        &quot;unit&quot;: &quot;mm&quot;\n      }\n    ],\n    &quot;controls&quot;: [\n      {\n        &quot;name&quot;: &quot;reference light condition&quot;\n      }\n    ],\n    &quot;procedure&quot;: [\n      &quot;Assign independent demonstration units&quot;,\n      &quot;Record synthetic growth values&quot;\n    ],\n    &quot;analysisPlan&quot;: &quot;Inspect run ranges and report limitations.&quot;,\n    &quot;sourceIds&quot;: [\n      &quot;synthetic-fixture-not-a-citation&quot;\n    ],\n    &quot;createdAt&quot;: &quot;2026-11-10T00:00:00Z&quot;\n  },\n  &quot;runs&quot;: [\n    {\n      &quot;id&quot;: &quot;r1&quot;,\n      &quot;replicate&quot;: 1,\n      &quot;results&quot;: {\n        &quot;growth&quot;: 10.0\n      }\n    },\n    {\n      &quot;id&quot;: &quot;r2&quot;,\n      &quot;replicate&quot;: 2,\n      &quot;results&quot;: {\n        &quot;growth&quot;: 10.2\n      }\n    }\n  ]\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-lab/blob/39fdefb3ff9cc73262b7d748cb44d2599094ae5a/backend/app/experiment_framework.py\">backend/app/experiment_framework.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-lab/blob/39fdefb3ff9cc73262b7d748cb44d2599094ae5a/backend/tests/test_experiment_framework_v0300.py\">backend/tests/test_experiment_framework_v0300.py</a></li></ul><p>Fixture: <code>lab-protocol.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-lab",
+        "commit": "39fdefb3ff9cc73262b7d748cb44d2599094ae5a",
+        "path": "backend/app/experiment_framework.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-lab",
+        "commit": "39fdefb3ff9cc73262b7d748cb44d2599094ae5a",
+        "path": "backend/tests/test_experiment_framework_v0300.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "lab-protocol.json",
+    "related": [
+      "lab-compare-replication-records"
+    ],
+    "content_sha256": "64af99e768460305e5a6fe5244380da62bce0c6a1b45e83b4c5dd6a52625f251",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "lab-compare-replication-records",
+    "title": "Research Lab: compare run records without overstating replication",
+    "slug": "lab-compare-replication-records",
+    "summary": "Record two synthetic runs, inspect the relative-range rule and produce a report while separating consistency from scientific replication.",
+    "product_slug": "research-lab",
+    "research_areas": [
+      "scientific-computing"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Record two synthetic runs, inspect the relative-range rule and produce a report while separating consistency from scientific replication.</p><p>This guide describes inspected source at commit <code>39fdefb3ff9cc73262b7d748cb44d2599094ae5a</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: record the two runs</h2><p>A run records one execution or observation set associated with a protocol. The synthetic demonstration records growth values 10.0 and 10.2 in the same unit. A comparison checks how far these values differ under an explicitly chosen tolerance; it does not establish an experimental effect.</p><ol><li>Validate and save the preceding protocol. Use its full normalized content, including timestamps, rather than recreating an apparently identical protocol with changing defaults.</li><li>Call <code>build_run</code> twice with the same protocol, explicit run IDs, replicate numbers 1 and 2, and results <code>{growth: 10.0}</code> and <code>{growth: 10.2}</code>.</li><li>Verify each returned record's <code>runHash</code>. Keep <code>protocolId</code>, <code>protocolHash</code>, observations, deviations and measurement units with the results.</li><li>Call <code>compare_runs</code> with at least these two runs and <code>relativeTolerance: 0.05</code>. Inspect every metric instead of only the top-level replication status.</li><li>Expect mean 10.1, minimum 10, maximum 10.2 and range approximately 0.2. Relative range is range divided by absolute mean: approximately 0.01980198, below 0.05.</li><li>Call <code>build_report</code> and retain its structured sections, run identities and Markdown. Independently review the report before publication.</li></ol>\n<h2>Researcher: consistency is not a significance test</h2><p>The algorithm uses (maximum\u2212minimum)/max(|mean|,1e-15) and returns consistent only when at least one numeric metric exists and every evaluated metric meets the tolerance. This is a descriptive rule. It is not a confidence interval, reproducibility probability, effect-size test or equivalence test. Two values are insufficient to establish scientific replication.</p><p>Near-zero means make relative range unstable. Use a scientifically justified absolute tolerance or a different analysis outside this rule when appropriate. Missing/non-finite values are excluded from numeric metric calculation; inspect counts and original records to identify exclusions. The comparison does not enforce common physical units automatically.</p>\n<h2>Developer: records, hashes and error paths</h2><p>The module supports at most 100 comparison runs, and fewer than two produces an explicit error. <code>build_run</code> records supplied results without executing arbitrary code or instruments. Default run status is completed, so callers must provide the actual lifecycle rather than mistaking the default for observed execution. A hash verifies serialized record integrity, not operator identity or measurement validity.</p><p>Reports include wall-clock creation context. For deterministic software fixture tests, the local runner controls time; production timestamps must remain truthful. Changing a result after hashing should fail verification. Preserve the failed record for diagnosis and create a new reviewed revision instead of silently recomputing an authoritative hash.</p>\n<h2>Next research action</h2><p>Review protocol deviations, experimental units and data quality before any inferential analysis. Store the two synthetic values separately from real measurements. A report build does not upload to Research Hub, publish an article or certify a research conclusion.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;protocol&quot;: {\n    &quot;title&quot;: &quot;Synthetic light response protocol&quot;,\n    &quot;domain&quot;: &quot;demonstration&quot;,\n    &quot;designType&quot;: &quot;controlled&quot;,\n    &quot;objective&quot;: &quot;Demonstrate structured records, not a biological conclusion.&quot;,\n    &quot;hypothesis&quot;: &quot;Light treatment changes the synthetic growth metric within the defined range.&quot;,\n    &quot;variables&quot;: [\n      {\n        &quot;name&quot;: &quot;light&quot;,\n        &quot;role&quot;: &quot;independent&quot;,\n        &quot;unit&quot;: &quot;umol m-2 s-1&quot;\n      },\n      {\n        &quot;name&quot;: &quot;growth&quot;,\n        &quot;role&quot;: &quot;dependent&quot;,\n        &quot;unit&quot;: &quot;mm&quot;\n      }\n    ],\n    &quot;controls&quot;: [\n      {\n        &quot;name&quot;: &quot;reference light condition&quot;\n      }\n    ],\n    &quot;procedure&quot;: [\n      &quot;Assign independent demonstration units&quot;,\n      &quot;Record synthetic growth values&quot;\n    ],\n    &quot;analysisPlan&quot;: &quot;Inspect run ranges and report limitations.&quot;,\n    &quot;sourceIds&quot;: [\n      &quot;synthetic-fixture-not-a-citation&quot;\n    ],\n    &quot;createdAt&quot;: &quot;2026-11-10T00:00:00Z&quot;\n  },\n  &quot;runs&quot;: [\n    {\n      &quot;id&quot;: &quot;r1&quot;,\n      &quot;replicate&quot;: 1,\n      &quot;results&quot;: {\n        &quot;growth&quot;: 10.0\n      }\n    },\n    {\n      &quot;id&quot;: &quot;r2&quot;,\n      &quot;replicate&quot;: 2,\n      &quot;results&quot;: {\n        &quot;growth&quot;: 10.2\n      }\n    }\n  ]\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-lab/blob/39fdefb3ff9cc73262b7d748cb44d2599094ae5a/backend/app/experiment_framework.py\">backend/app/experiment_framework.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-lab/blob/39fdefb3ff9cc73262b7d748cb44d2599094ae5a/backend/tests/test_experiment_framework_v0300.py\">backend/tests/test_experiment_framework_v0300.py</a></li></ul><p>Fixture: <code>lab-protocol.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-lab",
+        "commit": "39fdefb3ff9cc73262b7d748cb44d2599094ae5a",
+        "path": "backend/app/experiment_framework.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-lab",
+        "commit": "39fdefb3ff9cc73262b7d748cb44d2599094ae5a",
+        "path": "backend/tests/test_experiment_framework_v0300.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "lab-protocol.json",
+    "related": [
+      "lab-design-validate-protocol"
+    ],
+    "content_sha256": "baaf13dd42e1ffeb0dafb295450d925d1d3600a7e62a886b347d5d3a0ccfbfae",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "decision-build-tradeoff-matrix",
+    "title": "Decision Studio: build a complete, reviewable tradeoff matrix",
+    "slug": "decision-build-tradeoff-matrix",
+    "summary": "Compare two synthetic alternatives with explicit criteria, normalized weights and evidence gaps while retaining human decision authority.",
+    "product_slug": "decision-studio",
+    "research_areas": [
+      "analysis-decisions"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Compare two synthetic alternatives with explicit criteria, normalized weights and evidence gaps while retaining human decision authority.</p><p>This guide describes inspected source at commit <code>8c6c02be3993a9460269c8161e6505ca1bfe54a2</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: define criteria and alternatives</h2><p>An alternative is a candidate choice. A criterion is a dimension on which choices are compared. A weight states its relative importance in this particular decision. The fixture compares options A and B on two dimensionless, pre-normalized criteria. It is not a financial forecast or sustainability assessment.</p><ol><li>Use the source-pinned local backend and the supplied criteria, alternatives and evaluations. Criterion weights are 3 and 1, which normalize to 0.75 and 0.25.</li><li>For option A, provide scores 80 and 40; for option B, provide 60 and 90. Record the scale and the rationale for each score. Do not mix a raw cost with a 0\u2013100 benefit score.</li><li>Call <code>build_tradeoff_matrix(criteria, alternatives, evaluations, app_version)</code>. The fixture uses a demonstration version label for the library call; it is not a deployment assertion.</li><li>Inspect <code>alternative_summaries</code>, normalized weights, completeness, threshold violations and diagnostics.</li><li>Confirm A's weighted score is 70 and B's is 67.5. Then remove one evaluation and confirm the affected alternative's complete flag becomes false and weighted score becomes null.</li><li>Retain the matrix, criteria/evaluation identities, assumptions, provenance and review status for an accountable reviewer.</li></ol>\n<h2>Researcher: method and sensitivity</h2><p>The calculation is a weighted mean of supplied comparable scores, conditional on complete evaluations. The arithmetic is 0.75\u00b780 + 0.25\u00b740 = 70. Weights express judgment rather than objective importance. An interval between weighted scores is not statistical significance. A weighted-sum model may allow good performance on one criterion to offset poor performance on another, which can be inappropriate for non-negotiable safety or rights constraints.</p><p>Declare score transformations and criterion direction before scoring. Where a threshold is binding, inspect the explicit violation list rather than assuming a high overall score makes the alternative acceptable. Missing data is not an average score and should not be silently replaced by zero. Test sensitivity to plausible weights using the scenario guide.</p>\n<h2>Developer: normalization and lifecycle</h2><p>The source normalizes nonnegative weights, produces stable content fingerprints for matrix inputs and records a needs-review boundary. Duplicate criterion identities are normalized through identity-keyed records, so use unique explicit IDs and inspect the output. Zero total weight produces no meaningful weighted comparison.</p><p><code>TradeoffMatrixRequest</code> accepts packet/object context as well as direct criteria/evaluations. The direct library fixture tests the calculation independently of browser and database integration. It does not certify the full Decision Studio request path or a persistent event-store transaction. Keep local test results separate from staging receipts.</p>\n<h2>Troubleshooting and next action</h2><p>If a score is null, inspect completeness and nonnumeric inputs before changing weights. If results disagree with manual arithmetic, inspect normalized scores and scale conversion. The source states that comparison does not choose a winner or replace human judgment. Approval, implementation and monitoring remain separate governed actions.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;criteria&quot;: [\n    {\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;name&quot;: &quot;Criterion one&quot;,\n      &quot;weight&quot;: 3\n    },\n    {\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;name&quot;: &quot;Criterion two&quot;,\n      &quot;weight&quot;: 1\n    }\n  ],\n  &quot;alternatives&quot;: [\n    {\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;name&quot;: &quot;Option A&quot;\n    },\n    {\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;name&quot;: &quot;Option B&quot;\n    }\n  ],\n  &quot;evaluations&quot;: [\n    {\n      &quot;evaluation_id&quot;: &quot;ac1&quot;,\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;score&quot;: 80\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;ac2&quot;,\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;score&quot;: 40\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;bc1&quot;,\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;score&quot;: 60\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;bc2&quot;,\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;score&quot;: 90\n    }\n  ],\n  &quot;scenarios&quot;: [\n    {\n      &quot;scenario_id&quot;: &quot;base&quot;,\n      &quot;kind&quot;: &quot;baseline&quot;\n    },\n    {\n      &quot;scenario_id&quot;: &quot;equal&quot;,\n      &quot;kind&quot;: &quot;custom&quot;,\n      &quot;weight_overrides&quot;: [\n        {\n          &quot;criterion_id&quot;: &quot;c1&quot;,\n          &quot;weight&quot;: 1\n        },\n        {\n          &quot;criterion_id&quot;: &quot;c2&quot;,\n          &quot;weight&quot;: 1\n        }\n      ]\n    }\n  ]\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-decision-studio/blob/8c6c02be3993a9460269c8161e6505ca1bfe54a2/backend/app/tradeoff_matrix.py\">backend/app/tradeoff_matrix.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-decision-studio/blob/8c6c02be3993a9460269c8161e6505ca1bfe54a2/backend/tests/test_backend.py\">backend/tests/test_backend.py</a></li></ul><p>Fixture: <code>decision-matrix.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-decision-studio",
+        "commit": "8c6c02be3993a9460269c8161e6505ca1bfe54a2",
+        "path": "backend/app/tradeoff_matrix.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-decision-studio",
+        "commit": "8c6c02be3993a9460269c8161e6505ca1bfe54a2",
+        "path": "backend/tests/test_backend.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "decision-matrix.json",
+    "related": [
+      "decision-scenario-sensitivity"
+    ],
+    "content_sha256": "ca0258c17a3fa5579a88fcd45e49b2e3ddd4b87d695378bd14ec47c244df1d2a",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  },
+  {
+    "id": "decision-scenario-sensitivity",
+    "title": "Decision Studio: inspect scenario sensitivity without predicting likelihood",
+    "slug": "decision-scenario-sensitivity",
+    "summary": "Change criterion weights in explicit synthetic scenarios, identify conditional ordering changes and preserve uncertainty boundaries.",
+    "product_slug": "decision-studio",
+    "research_areas": [
+      "analysis-decisions"
+    ],
+    "audiences": [
+      "beginner",
+      "researcher",
+      "developer"
+    ],
+    "content": "<p><strong>Editorial status:</strong> Draft for technical, scientific and editorial review. No public publication is authorized.</p><h2>Outcome and availability</h2><p>Change criterion weights in explicit synthetic scenarios, identify conditional ordering changes and preserve uncertainty boundaries.</p><p>This guide describes inspected source at commit <code>8c6c02be3993a9460269c8161e6505ca1bfe54a2</code>. Browser controls, sign-in, hosting, cross-application delivery and production availability have not been verified. The numbered procedure below is a local source or API acceptance exercise, not a claim that a public website currently exposes these controls. A source test file is evidence of intended behavior; consult the separate execution receipt for tests that actually ran.</p>\n<h2>Beginner: start with a complete matrix</h2><p>A scenario describes a set of conditional assumptions. It is not a prediction that those assumptions will occur. Use the complete matrix from the preceding guide: A scores [80,40], B scores [60,90], with baseline weights [3,1]. The baseline weighted scores are 70 and 67.5.</p><ol><li>Build and inspect the original complete matrix. Save criterion and evaluation IDs before constructing overrides.</li><li>Call <code>build_scenario_set</code> with an explicit baseline scenario and a second scenario setting both criterion weights to 1.</li><li>Pass the matrix and normalized scenario set to <code>compare_scenarios</code>. This creates conditional comparison records; it does not send decisions to other applications.</li><li>Inspect <code>scenario_results</code>, completeness, threshold counts, alternative score deltas and <code>ordering_changed_vs_baseline</code>.</li><li>Expect equal-weight scores A=60 and B=75. The conditional ordering changes compared with baseline. Preserve the assumption change explaining why; do not report B as the universally preferred option.</li><li>Review <code>alternative_score_ranges</code> and maximum score swing. Include all scenario assumptions and omitted uncertainties in any report.</li></ol>\n<h2>Researcher: interpret conditional instability</h2><p>The comparison is deterministic for specified inputs and supports identifying sensitivity to weights or evaluations. It assigns no probabilities to scenarios. A minimum/maximum score over two chosen scenarios is not a confidence interval, a prediction interval or a worst-case guarantee over all possible futures.</p><p>Select scenarios that reflect defensible ranges and independent evidence, not ranges designed to justify a favored alternative. Keep uncertainty in scores separate from value judgments in weights. A scenario that breaches a threshold needs review even when its weighted score is attractive. Do not average scenario scores without a justified probability model.</p>\n<h2>Developer: override identities and failure diagnosis</h2><p>Weight overrides reference criterion IDs. Evaluation overrides reference evaluation IDs. The normalizer records unknown references; inspect those diagnostic fields instead of assuming an override applied. If an override supplies value without score, the implementation removes an existing explicit normalized score so the value can be renormalized. This behavior makes score-scale metadata important.</p><p>The comparison identifies a baseline explicitly by kind, otherwise uses the first scenario if present. Always declare baseline to avoid accidental reordering effects. An incomplete matrix can produce incomplete scenarios and missing scores; do not coerce missing scores into a sortable number. The source's boundary explicitly excludes automatic recommendation and scenario-likelihood inference.</p>\n<h2>Next action and operational boundary</h2><p>Present conditional reversals to the accountable decision reviewer with the original evidence and assumptions. The local fixture exercises source functions, not deployed authentication, user-interface controls, event-store persistence or downstream integration. Those remain unverified until separately tested with an authorized environment and recorded acceptance receipt.</p><h2>Copyable synthetic input</h2><pre><code>{\n  &quot;criteria&quot;: [\n    {\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;name&quot;: &quot;Criterion one&quot;,\n      &quot;weight&quot;: 3\n    },\n    {\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;name&quot;: &quot;Criterion two&quot;,\n      &quot;weight&quot;: 1\n    }\n  ],\n  &quot;alternatives&quot;: [\n    {\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;name&quot;: &quot;Option A&quot;\n    },\n    {\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;name&quot;: &quot;Option B&quot;\n    }\n  ],\n  &quot;evaluations&quot;: [\n    {\n      &quot;evaluation_id&quot;: &quot;ac1&quot;,\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;score&quot;: 80\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;ac2&quot;,\n      &quot;alternative_id&quot;: &quot;a&quot;,\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;score&quot;: 40\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;bc1&quot;,\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;criterion_id&quot;: &quot;c1&quot;,\n      &quot;score&quot;: 60\n    },\n    {\n      &quot;evaluation_id&quot;: &quot;bc2&quot;,\n      &quot;alternative_id&quot;: &quot;b&quot;,\n      &quot;criterion_id&quot;: &quot;c2&quot;,\n      &quot;score&quot;: 90\n    }\n  ],\n  &quot;scenarios&quot;: [\n    {\n      &quot;scenario_id&quot;: &quot;base&quot;,\n      &quot;kind&quot;: &quot;baseline&quot;\n    },\n    {\n      &quot;scenario_id&quot;: &quot;equal&quot;,\n      &quot;kind&quot;: &quot;custom&quot;,\n      &quot;weight_overrides&quot;: [\n        {\n          &quot;criterion_id&quot;: &quot;c1&quot;,\n          &quot;weight&quot;: 1\n        },\n        {\n          &quot;criterion_id&quot;: &quot;c2&quot;,\n          &quot;weight&quot;: 1\n        }\n      ]\n    }\n  ]\n}</code></pre><h2>Source, verification and next review</h2><ul><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-decision-studio/blob/8c6c02be3993a9460269c8161e6505ca1bfe54a2/backend/app/scenario_stress.py\">backend/app/scenario_stress.py</a></li><li><a href=\"https://github.com/Content-Catalyst-LLC/sustainable-catalyst-decision-studio/blob/8c6c02be3993a9460269c8161e6505ca1bfe54a2/backend/tests/test_backend.py\">backend/tests/test_backend.py</a></li></ul><p>Fixture: <code>decision-matrix.json</code>. The fixture contains synthetic demonstration values and no environmental measurements or participant records. Numerical agreement is a software check, not scientific validation of a real study. Keep the request, response, method, input units, source revision and error output together when reproducing this guide. Technical and scientific review owners are unassigned; review remains pending.</p>",
+    "verification": "SOURCE_ONLY",
+    "editorial_status": "draft",
+    "visibility": "public_review_candidate",
+    "sources": [
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-decision-studio",
+        "commit": "8c6c02be3993a9460269c8161e6505ca1bfe54a2",
+        "path": "backend/app/scenario_stress.py",
+        "verification": "SOURCE_ONLY"
+      },
+      {
+        "repository": "Content-Catalyst-LLC/sustainable-catalyst-decision-studio",
+        "commit": "8c6c02be3993a9460269c8161e6505ca1bfe54a2",
+        "path": "backend/tests/test_backend.py",
+        "verification": "TEST_SOURCE_PRESENT_NOT_EXECUTION_RECEIPT"
+      }
+    ],
+    "fixture": "decision-matrix.json",
+    "related": [
+      "decision-build-tradeoff-matrix"
+    ],
+    "content_sha256": "4e3e93d63fa83a25840e7f4c30d8d3e75094b46f4339d256b76056fb449486a0",
+    "privacy": "public-review-candidate",
+    "license": "CC-BY-4.0",
+    "example_verification": "TESTED_LOCAL_SOURCE",
+    "ui_verification": "UNVERIFIED",
+    "production_verification": "UNVERIFIED"
+  }
+]

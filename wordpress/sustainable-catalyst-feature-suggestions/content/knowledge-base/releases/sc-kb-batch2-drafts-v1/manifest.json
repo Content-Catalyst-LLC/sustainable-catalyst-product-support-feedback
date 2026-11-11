@@ -1,0 +1,16 @@
+{
+  "schema_version": "sc.kb.release.v1",
+  "release_id": "sc-kb-batch2-drafts-v1",
+  "editorial_state": "draft",
+  "article_count": 10,
+  "availability": "Source/examples checked; UI and production UNVERIFIED",
+  "files": {
+    "articles.json": "2cf3b1876aa4ee08b2d882a3d9619bbf1d7c706545c9753fd64127a2bda099da",
+    "fixtures/decision-matrix.json": "6314b5e52229b6fa60697183e6da64171a70379059a3a6a1e0929180ff586355",
+    "fixtures/lab-protocol.json": "ea06b464986e343a89302d6fb2ec293f05e11c398529efd8523045b845c381a7",
+    "fixtures/site-spatial.json": "ab82d905b9710b9b2615fd583e89e933bf558097020f43493caeb660b4be4a3e",
+    "fixtures/workbench-integration.json": "d5299dab8989f88d55d8ae45498323cb21b134757e3ca54569b2422681f0b7c6",
+    "fixtures/workbench-linear.json": "becb3c8c49a044007f3474948527cd91e86d127c581e6264749ba6151616751e",
+    "fixtures/workbench-root.json": "4f16861d6ef892bea7412864b63106409f57817092f6f03e0bf8f290406440fc"
+  }
+}

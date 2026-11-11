@@ -24,11 +24,32 @@ def inventory():
                           'body_sha256':hashlib.sha256(a['content'].encode()).hexdigest(),
                           'verification':'UNVERIFIED','coverage':'DRAFT',
                           'reason':'Historical bundled guidance; actual application and runtime evidence must be audited'} for a in articles]}
+def validate_releases():
+    for directory in sorted((PLUGIN/'content/knowledge-base/releases').glob('*')):
+        if not directory.is_dir(): continue
+        manifest=json.loads((directory/'manifest.json').read_text())
+        assert manifest['release_id']==directory.name and manifest['schema_version']=='sc.kb.release.v1'
+        for relative,digest in manifest['files'].items():
+            assert '..' not in relative and not relative.startswith('/')
+            assert hashlib.sha256((directory/relative).read_bytes()).hexdigest()==digest, relative
+        articles=json.loads((directory/'articles.json').read_text());ids={a['id'] for a in articles}
+        assert 0<len(articles)<=500 and len(ids)==len(articles)
+        assert (directory/'articles.json').stat().st_size<=2097152
+        for a in articles:
+            assert a['privacy']=='public-review-candidate' and a['license']=='CC-BY-4.0'
+            assert a['sources'] and len(re.sub('<[^>]+>',' ',a['content']).split())>=500
+            assert set(a.get('related',[]))<=ids
+            assert not re.search(r'<(?:script|iframe)\b|javascript:|onerror\s*=',a['content'],re.I)
+            assert a['research_areas']
+            for source in a['sources']:
+                assert re.fullmatch('[0-9a-f]{40}',source['commit']) and '..' not in source['path']
+
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--output', type=pathlib.Path, required=True); args=parser.parse_args()
     args.output.mkdir(parents=True,exist_ok=True)
+    validate_releases();
     record=inventory(); (args.output/'source-inventory.json').write_text(json.dumps(record,indent=2)+'\n')
-    archive=args.output/'sustainable-catalyst-feature-suggestions-7.8.2-alpha.1.zip'
+    archive=args.output/'sustainable-catalyst-feature-suggestions-7.8.2-alpha.2.zip'
     checksums={}
     with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
         for path in sorted(PLUGIN.rglob('*')):
@@ -40,6 +61,6 @@ def main():
             info.compress_type=zipfile.ZIP_DEFLATED; info.external_attr=0o100644 << 16; z.writestr(info,raw)
     digest=hashlib.sha256(archive.read_bytes()).hexdigest()
     (args.output/(archive.name+'.sha256')).write_text(digest+'  '+archive.name+'\n')
-    (args.output/'package-manifest.json').write_text(json.dumps({'version':'7.8.2-alpha.1','status':'DEVELOPMENT_NOT_RELEASE_CANDIDATE','source_sha':record['source_sha'],'files':checksums,'zip_sha256':digest},indent=2)+'\n')
+    (args.output/'package-manifest.json').write_text(json.dumps({'version':'7.8.2-alpha.2','status':'DEVELOPMENT_NOT_RELEASE_CANDIDATE','source_sha':record['source_sha'],'files':checksums,'zip_sha256':digest},indent=2)+'\n')
     print(json.dumps({'archive':str(archive),'sha256':digest,'articles':record['article_count'],'samples':record['sample_count']}))
 if __name__ == '__main__': main()

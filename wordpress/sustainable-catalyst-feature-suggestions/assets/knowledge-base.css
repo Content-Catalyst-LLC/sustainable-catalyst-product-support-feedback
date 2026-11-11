@@ -2138,3 +2138,6 @@ body.single-sc_support_article .entry-content { margin: 0 !important; padding: 0
 .scfs-kb-applications summary {cursor:pointer;padding:1rem;font-weight:700;color:#000}
 .scfs-kb-area-context {border-left:4px solid #f00;padding:1rem;background:#fff;color:#000}
 @media(max-width:760px){.scfs-kb--library-browser .scfs-kb-library-layout{display:block}.scfs-kb--library-browser .scfs-kb-library-navigation{position:static;max-height:none}}
+.scfs-kb-pagination {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.5rem;padding:1rem;border-top:1px solid #000;color:#000;background:#fff}
+.scfs-kb-pagination a {padding:.5rem .75rem;border:1px solid #000;color:#000;text-decoration:underline;text-underline-offset:.2em}
+.scfs-kb-pagination a:hover {border-color:#f00;box-shadow:inset 0 -3px #f00}

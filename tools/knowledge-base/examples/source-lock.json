@@ -1,0 +1,392 @@
+{
+  "schema": "sc.kb.application-source-inventory.v1",
+  "as_of": "2026-11-10",
+  "scope": "Static Python route/function/class extraction across four backend/app trees, with selected manual method audits. Not a complete UI, runtime, permissions or deployment audit.",
+  "manual_audit_scope": "Selected numerical solver, spatial evidence, protocol/replication and tradeoff/scenario methods. Other records are extracted candidates, not manually verified features.",
+  "applications": [
+    {
+      "application": "workbench",
+      "repository": "Content-Catalyst-LLC/sustainable-catalyst-workbench",
+      "source_sha": "7f7c23fd609386619f95ba9a4f932bbdca097b3b",
+      "static_symbols": 3213,
+      "static_route_decorators": 1085,
+      "test_files": 113,
+      "manually_tested_methods": 2,
+      "full_application_audit_complete": false,
+      "coverage_dimensions": [
+        {
+          "dimension": "purpose-use-cases-and-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "access-installation-identity-roles",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "ui-controls-navigation-and-accessibility",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "project-ownership-permissions-and-collaboration",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "data-ingest-connectors-schemas-licenses",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "research-objects-provenance-and-persistence",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "algorithms-models-methods-parameters-and-execution",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "charts-graphs-maps-rendering-and-export",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "artifacts-reload-reports-and-cross-application-handoffs",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "api-cli-sdk-config-errors-idempotency-and-limits",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "scientific-reproducibility-quality-units-and-uncertainty",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "operations-security-logging-backups-restore-and-rollback",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "release-compatibility-deprecation-and-known-issues",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "integration-workflows-and-authority-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "application": "site-intelligence",
+      "repository": "Content-Catalyst-LLC/sustainable-catalyst-site-intelligence",
+      "source_sha": "43660fb002e7d892442473dfd323dbab4f6fd68e",
+      "static_symbols": 3524,
+      "static_route_decorators": 1530,
+      "test_files": 296,
+      "manually_tested_methods": 5,
+      "full_application_audit_complete": false,
+      "coverage_dimensions": [
+        {
+          "dimension": "purpose-use-cases-and-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "access-installation-identity-roles",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "ui-controls-navigation-and-accessibility",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "project-ownership-permissions-and-collaboration",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "data-ingest-connectors-schemas-licenses",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "research-objects-provenance-and-persistence",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "algorithms-models-methods-parameters-and-execution",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "charts-graphs-maps-rendering-and-export",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "artifacts-reload-reports-and-cross-application-handoffs",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "api-cli-sdk-config-errors-idempotency-and-limits",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "scientific-reproducibility-quality-units-and-uncertainty",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "operations-security-logging-backups-restore-and-rollback",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "release-compatibility-deprecation-and-known-issues",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "integration-workflows-and-authority-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "application": "lab",
+      "repository": "Content-Catalyst-LLC/sustainable-catalyst-lab",
+      "source_sha": "39fdefb3ff9cc73262b7d748cb44d2599094ae5a",
+      "static_symbols": 7746,
+      "static_route_decorators": 3556,
+      "test_files": 221,
+      "manually_tested_methods": 6,
+      "full_application_audit_complete": false,
+      "coverage_dimensions": [
+        {
+          "dimension": "purpose-use-cases-and-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "access-installation-identity-roles",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "ui-controls-navigation-and-accessibility",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "project-ownership-permissions-and-collaboration",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "data-ingest-connectors-schemas-licenses",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "research-objects-provenance-and-persistence",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "algorithms-models-methods-parameters-and-execution",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "charts-graphs-maps-rendering-and-export",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "artifacts-reload-reports-and-cross-application-handoffs",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "api-cli-sdk-config-errors-idempotency-and-limits",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "scientific-reproducibility-quality-units-and-uncertainty",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "operations-security-logging-backups-restore-and-rollback",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "release-compatibility-deprecation-and-known-issues",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "integration-workflows-and-authority-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "application": "decision-studio",
+      "repository": "Content-Catalyst-LLC/sustainable-catalyst-decision-studio",
+      "source_sha": "8c6c02be3993a9460269c8161e6505ca1bfe54a2",
+      "static_symbols": 784,
+      "static_route_decorators": 2,
+      "test_files": 17,
+      "manually_tested_methods": 3,
+      "full_application_audit_complete": false,
+      "coverage_dimensions": [
+        {
+          "dimension": "purpose-use-cases-and-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "access-installation-identity-roles",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "ui-controls-navigation-and-accessibility",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "project-ownership-permissions-and-collaboration",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "data-ingest-connectors-schemas-licenses",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "research-objects-provenance-and-persistence",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "algorithms-models-methods-parameters-and-execution",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "charts-graphs-maps-rendering-and-export",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "artifacts-reload-reports-and-cross-application-handoffs",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "api-cli-sdk-config-errors-idempotency-and-limits",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "scientific-reproducibility-quality-units-and-uncertainty",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "operations-security-logging-backups-restore-and-rollback",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "release-compatibility-deprecation-and-known-issues",
+          "coverage": "GAP",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        },
+        {
+          "dimension": "integration-workflows-and-authority-boundaries",
+          "coverage": "DRAFT",
+          "scope": "Selected methods only; see article/source fixture receipts. No full dimension certification.",
+          "runtime": "UNVERIFIED"
+        }
+      ]
+    }
+  ]
+}

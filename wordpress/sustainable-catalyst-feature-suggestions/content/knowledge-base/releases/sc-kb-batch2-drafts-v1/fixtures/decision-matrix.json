@@ -1,0 +1,70 @@
+{
+  "criteria": [
+    {
+      "criterion_id": "c1",
+      "name": "Criterion one",
+      "weight": 3
+    },
+    {
+      "criterion_id": "c2",
+      "name": "Criterion two",
+      "weight": 1
+    }
+  ],
+  "alternatives": [
+    {
+      "alternative_id": "a",
+      "name": "Option A"
+    },
+    {
+      "alternative_id": "b",
+      "name": "Option B"
+    }
+  ],
+  "evaluations": [
+    {
+      "evaluation_id": "ac1",
+      "alternative_id": "a",
+      "criterion_id": "c1",
+      "score": 80
+    },
+    {
+      "evaluation_id": "ac2",
+      "alternative_id": "a",
+      "criterion_id": "c2",
+      "score": 40
+    },
+    {
+      "evaluation_id": "bc1",
+      "alternative_id": "b",
+      "criterion_id": "c1",
+      "score": 60
+    },
+    {
+      "evaluation_id": "bc2",
+      "alternative_id": "b",
+      "criterion_id": "c2",
+      "score": 90
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "base",
+      "kind": "baseline"
+    },
+    {
+      "scenario_id": "equal",
+      "kind": "custom",
+      "weight_overrides": [
+        {
+          "criterion_id": "c1",
+          "weight": 1
+        },
+        {
+          "criterion_id": "c2",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}
