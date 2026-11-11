@@ -5,7 +5,7 @@
   "article_count": 10,
   "availability": "Source/examples checked; UI and production UNVERIFIED",
   "files": {
-    "articles.json": "2cf3b1876aa4ee08b2d882a3d9619bbf1d7c706545c9753fd64127a2bda099da",
+    "articles.json": "61e0a68f627f777cd7d836c7aae414846c060042d1faa9415bfe2be16e9c4078",
     "fixtures/decision-matrix.json": "6314b5e52229b6fa60697183e6da64171a70379059a3a6a1e0929180ff586355",
     "fixtures/lab-protocol.json": "ea06b464986e343a89302d6fb2ec293f05e11c398529efd8523045b845c381a7",
     "fixtures/site-spatial.json": "ab82d905b9710b9b2615fd583e89e933bf558097020f43493caeb660b4be4a3e",

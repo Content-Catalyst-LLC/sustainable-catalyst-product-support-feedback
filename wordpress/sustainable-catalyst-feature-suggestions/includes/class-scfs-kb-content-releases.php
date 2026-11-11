@@ -126,6 +126,18 @@ final class SCFS_KB_Content_Releases {
             return $run;
         });
     }
+    /** Compare-and-swap draft body: concurrent editor writes/approvals win. */
+    private function update_draft($post_id, $before, $article) {
+        global $wpdb;
+        $now = current_time('mysql');
+        $sql = $wpdb->prepare("UPDATE {$wpdb->posts} SET post_title=%s, post_content=%s, post_excerpt=%s, post_modified=%s, post_modified_gmt=%s WHERE ID=%d AND post_status='draft' AND CAST(post_title AS BINARY)=CAST(%s AS BINARY) AND CAST(post_content AS BINARY)=CAST(%s AS BINARY) AND CAST(post_excerpt AS BINARY)=CAST(%s AS BINARY) AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} em WHERE em.post_id={$wpdb->posts}.ID AND em.meta_key='_scfs_editorial_state' AND em.meta_value IN ('approved','published','scheduled'))", $article['title'], $article['content'], $article['summary'], $now, current_time('mysql', true), $post_id, $before['post_title'], $before['post_content'], $before['post_excerpt']);
+        $changed = $wpdb->query($sql);
+        if ($changed !== 1) return new WP_Error('scfs_kb_concurrent_edit', 'Concurrent edit or editorial approval detected; article preserved.');
+        clean_post_cache($post_id);
+        if (function_exists('wp_save_post_revision')) wp_save_post_revision($post_id);
+        return $post_id;
+    }
+
     public function batch($id, $limit = 10) {
         return $this->locked(function() use ($id, $limit) {
             $run = $this->status($id);
@@ -140,7 +152,7 @@ final class SCFS_KB_Content_Releases {
                 $prior = $run['records'][$index] ?? null;
                 if ($prior && ($prior['state'] ?? '') === 'intent') {
                     if (!empty($prior['post_id']) && ($row['state'] === 'unchanged')) {
-                        $prior['state'] = 'applied'; $prior['after_hash'] = $this->article_hash($a); $run['records'][$index] = $prior;
+                        $prior['state'] = 'applied'; $prior['after_hash'] = $this->article_hash($a); $prior['after_status'] = get_post_status($prior['post_id']); $prior['after_editorial'] = get_post_meta($prior['post_id'], '_scfs_editorial_state', true); $run['records'][$index] = $prior;
                     } else {
                         $run['records'][$index] = array('state' => 'conflicting', 'id' => $a['id'], 'reason' => 'Interrupted write requires manual reconciliation; no replay mutation.');
                     }
@@ -154,7 +166,7 @@ final class SCFS_KB_Content_Releases {
                     $run['records'][$index] = $record; $this->save($run);
                     // Existing drafts retain ID, slug and all editorial metadata/status.
                     $payload = array('post_title' => $a['title'], 'post_content' => $a['content'], 'post_excerpt' => $a['summary']);
-                    if ($post_id) { $payload['ID'] = $post_id; $result = wp_update_post(wp_slash($payload), true); }
+                    if ($post_id) { $result = $this->update_draft($post_id, $before, $a); }
                     else {
                         $payload += array('post_type' => 'sc_support_article', 'post_status' => 'draft', 'post_name' => $a['slug'], 'meta_input' => array(self::KEY => $a['id'], '_scfs_human_review_required' => '1', '_scfs_editorial_state' => 'draft'));
                         $result = wp_insert_post(wp_slash($payload), true);
@@ -165,6 +177,11 @@ final class SCFS_KB_Content_Releases {
                         update_post_meta($post_id, '_scfs_kb_product_slug', sanitize_title($a['product_slug']));
                         update_post_meta($post_id, '_scfs_kb_research_areas', array_values($a['research_areas']));
                         update_post_meta($post_id, '_scfs_kb_verification', $a['verification']);
+                        update_post_meta($post_id, '_scfs_kb_release_id', $run['release_id']);
+                        update_post_meta($post_id, '_scfs_kb_source_evidence', $a['sources']);
+                        update_post_meta($post_id, '_scfs_kb_related_keys', $a['related'] ?? array());
+                        update_post_meta($post_id, '_scfs_article_audience', implode(', ', $a['audiences'] ?? array()));
+                        update_post_meta($post_id, '_scfs_kb_summary', $a['summary']);
                     }
                     update_post_meta($post_id, self::KEY, $a['id']); update_post_meta($post_id, self::HASH, $this->article_hash($a));
                     $run['records'][$index]['after_hash'] = $this->post_hash(get_post($post_id));
@@ -190,7 +207,7 @@ final class SCFS_KB_Content_Releases {
                 if (!$p || !hash_equals($r['after_hash'], $this->post_hash($p)) || $p->post_status !== $r['after_status'] || get_post_meta($p->ID, '_scfs_editorial_state', true) !== ($r['after_editorial'] ?? 'draft')) { $run['records'][$index]['rollback_conflict'] = 'Record edited, approved, removed or status changed after import; preserved.'; $blocked = true; continue; }
                 if ($r['before']) {
                     $restore = array_intersect_key($r['before'], array_flip(array('ID','post_title','post_content','post_excerpt')));
-                    $result = wp_update_post(wp_slash($restore), true);
+                    $result = $this->update_draft($p->ID, (array) $p, array('title'=>$restore['post_title'], 'content'=>$restore['post_content'], 'summary'=>$restore['post_excerpt']));
                     if (is_wp_error($result)) throw new RuntimeException($result->get_error_message());
                     foreach (array(self::KEY,self::HASH) as $key) {
                         delete_post_meta($p->ID, $key);
@@ -199,7 +216,6 @@ final class SCFS_KB_Content_Releases {
                 } else {
                     // Keep the record/URL and review history; retire only the unchanged imported draft.
                     update_post_meta($p->ID, '_scfs_kb_release_retired', $run['release_id']);
-                    wp_update_post(array('ID' => $p->ID, 'post_status' => 'draft'));
                 }
                 $run['records'][$index]['state'] = 'rolled_back'; $this->event($run, 'rollback_record', $r['id']); $this->save($run);
             }

@@ -67,10 +67,21 @@ try {
     file_put_contents($dir.'/articles.json','[]');$denied=false;try{$m->preview($prefix);}catch(RuntimeException $e){$denied=true;}$assert($denied,'tampered bundle checksum rejected');
     $write($articles);$preview=$m->preview($prefix);
     $denied=false;try{$m->begin($prefix,str_repeat('f',64),str_repeat('a',64));}catch(RuntimeException $e){$denied=true;}$assert($denied,'changed/unreviewed manifest fingerprint rejected');
+    $method = new ReflectionMethod($m, 'update_draft');
+    $stale = get_post($first, ARRAY_A);
+    wp_update_post(array('ID'=>$first,'post_content'=>strtoupper($stale['post_content'])));
+    $cas = $method->invoke($m, $first, $stale, array('title'=>$stale['post_title'],'content'=>'Must never overwrite a concurrent editor.','summary'=>$stale['post_excerpt']));
+    $assert(is_wp_error($cas) && get_post($first)->post_content===strtoupper($stale['post_content']), 'case-only concurrent human edit defeats atomic compare-and-swap');
+    add_option(SCFS_KB_Content_Releases::LOCK,array('token'=>'fixture-lock','expires'=>time()+600),'',false);
+    $denied=false;try{$m->batch($run['id']);}catch(RuntimeException $e){$denied=true;}$assert($denied,'concurrent request cannot acquire occupied release lock');
+    $denied=false;try{$m->recover_lock();}catch(RuntimeException $e){$denied=true;}$assert($denied,'active lock cannot be force-recovered');
+    update_option(SCFS_KB_Content_Releases::LOCK,array('token'=>'fixture-lock','expires'=>time()-1),false);$m->recover_lock();
+    $assert(get_option(SCFS_KB_Content_Releases::LOCK)===false,'expired interrupted lock can be explicitly recovered');
     echo wp_json_encode(array('suite'=>'real-wordpress-review-only-releases','checks'=>$checks,'wordpress'=>get_bloginfo('version'),'database'=>get_class($GLOBALS['wpdb']),'new_review_drafts'=>5,'published_by_import'=>0))."\n";
 } finally {
     foreach(array_unique($created) as $id) wp_delete_post($id,true);
     foreach($run_ids as $id) delete_option('scfs_kb_run_'.$id);
+    update_option('scfs_kb_release_runs', array_values(array_diff(get_option('scfs_kb_release_runs',array()),$run_ids)), false);
     delete_option(SCFS_KB_Content_Releases::ACTIVE); delete_option(SCFS_KB_Content_Releases::LOCK);
     foreach((array)glob($dir.'/*') as $file) unlink($file);rmdir($dir);
 }
