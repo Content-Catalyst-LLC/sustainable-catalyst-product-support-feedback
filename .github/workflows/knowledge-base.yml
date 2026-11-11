@@ -1,0 +1,28 @@
+name: Knowledge Base Development Package
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/sc-kb-*']
+permissions:
+  contents: read
+jobs:
+  validate-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP syntax
+        run: find wordpress -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Navigation, search and legacy import regressions (isolated harness)
+        run: |
+          php tests/test-sc-kb-navigation.php
+          php tests/test-v525-library-browser.php
+          php tests/test-v529-search-quality.php
+      - name: Validate source inventory and build deterministic ZIP
+        run: |
+          python3 tools/knowledge-base/build.py --output dist/first
+          python3 tools/knowledge-base/build.py --output dist/second
+          cmp dist/first/*.zip dist/second/*.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sc-kb-development-package
+          path: dist/first/*

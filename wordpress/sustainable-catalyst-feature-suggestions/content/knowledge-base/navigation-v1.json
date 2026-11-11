@@ -1,0 +1,95 @@
+{
+  "schema_version": "sc.kb.navigation.v1",
+  "areas": {
+    "research-projects": {
+      "id": "KB-R01",
+      "label": "Research Projects",
+      "description": "Research questions, Methods and hypotheses, Workspace projects, Experiment design, Reproducibility"
+    },
+    "discovery-sources": {
+      "id": "KB-R02",
+      "label": "Discovery & Sources",
+      "description": "Research discovery, Research Librarian, Knowledge Library, Source evaluation, Data providers and citations"
+    },
+    "data-research-objects": {
+      "id": "KB-R03",
+      "label": "Data & Research Objects",
+      "description": "Dataset acquisition, Validation and provenance, Research object types, Revisions and rights, Knowledge graph"
+    },
+    "scientific-computing": {
+      "id": "KB-R04",
+      "label": "Scientific Computing",
+      "description": "Calculations and notebooks, Statistical methods, Modeling and simulations, Research Lab, Workbench"
+    },
+    "visualization-graphing": {
+      "id": "KB-R05",
+      "label": "Visualization & Graphing",
+      "description": "Scientific charts, Figures and exports, Geospatial mapping, Dashboards, Interactive and 3D/4D (verified only)"
+    },
+    "analysis-decisions": {
+      "id": "KB-R06",
+      "label": "Analysis & Decisions",
+      "description": "Scenarios and sensitivity, Financial and economic analysis, Risk and impact, Decision Studio, Uncertainty"
+    },
+    "reporting-publishing": {
+      "id": "KB-R07",
+      "label": "Reporting & Publishing",
+      "description": "Scientific reports, Research output workspaces, Review and approval, Reproducible publishing, Research Hub"
+    },
+    "platform-developers": {
+      "id": "KB-R08",
+      "label": "Platform & Developer Tools",
+      "description": "Application directory, Accounts and permissions, API and connectors, Known issues and releases, Support and administration"
+    }
+  },
+  "product_areas": {
+    "workbench": [
+      "scientific-computing"
+    ],
+    "decision-studio": [
+      "analysis-decisions"
+    ],
+    "site-intelligence": [
+      "discovery-sources"
+    ],
+    "research-librarian": [
+      "discovery-sources"
+    ],
+    "knowledge-library": [
+      "discovery-sources"
+    ],
+    "research-lab": [
+      "scientific-computing"
+    ],
+    "catalyst-canvas": [
+      "research-projects"
+    ],
+    "catalyst-data": [
+      "data-research-objects"
+    ],
+    "catalyst-analytics-r": [
+      "scientific-computing"
+    ],
+    "catalyst-finance": [
+      "analysis-decisions"
+    ],
+    "narrative-risk": [
+      "analysis-decisions"
+    ],
+    "catalyst-grit": [
+      "analysis-decisions"
+    ],
+    "global-impact-catalyst": [
+      "analysis-decisions"
+    ],
+    "product-support-platform": [
+      "platform-developers"
+    ],
+    "contact-engagement": [
+      "platform-developers"
+    ],
+    "platform-core": [
+      "data-research-objects"
+    ]
+  }
+}

@@ -34,6 +34,7 @@ final class SCFS_Integrated_Knowledge_Base {
     const LEGACY_ROUTE_META = '_scfs_kb_legacy_route_version';
 
     private static $instance = null;
+    private $navigation_data = null;
     private $rendering_article = false;
     private $importing_documentation = false;
 
@@ -693,14 +694,18 @@ final class SCFS_Integrated_Knowledge_Base {
     }
 
     private function all_published_articles() {
-        return get_posts(array(
+        $posts = get_posts(array(
             'post_type' => SCFS_Knowledge_Base_Foundation::ARTICLE_POST_TYPE,
             'post_status' => 'publish',
-            'posts_per_page' => 500,
+            'posts_per_page' => -1,
+            'has_password' => false,
             'orderby' => array('menu_order' => 'ASC', 'title' => 'ASC'),
             'order' => 'ASC',
             'suppress_filters' => false,
         ));
+        return array_values(array_filter($posts, static function($post) {
+            return $post->post_status === 'publish' && empty($post->post_password);
+        }));
     }
 
     private function article_product_slug($post) {
@@ -1039,6 +1044,23 @@ final class SCFS_Integrated_Knowledge_Base {
         echo '</div>';
     }
 
+    /** Versioned browsing associations; they make no runtime availability claim. */
+    public function research_navigation() {
+        if ($this->navigation_data !== null) return $this->navigation_data;
+        $path = $this->plugin_root() . 'content/knowledge-base/navigation-v1.json';
+        $data = is_readable($path) ? json_decode(file_get_contents($path), true) : null;
+        $this->navigation_data = is_array($data) && isset($data['areas'], $data['product_areas']) ? $data : array('areas' => array(), 'product_areas' => array());
+        return $this->navigation_data;
+    }
+
+    public function article_research_areas($post) {
+        $navigation = $this->research_navigation();
+        // Explicit many-to-many metadata takes precedence; no post is cloned.
+        $explicit = get_post_meta($post->ID, '_scfs_kb_research_areas', true);
+        $areas = is_array($explicit) ? $explicit : ($navigation['product_areas'][$this->article_product_slug($post)] ?? array());
+        return array_values(array_intersect(array_keys($navigation['areas']), $areas));
+    }
+
     public function render_browser($atts = array()) {
         $atts = shortcode_atts(array(
             'title' => __('Support Knowledge Base', 'sustainable-catalyst-feature-suggestions'),
@@ -1059,6 +1081,9 @@ final class SCFS_Integrated_Knowledge_Base {
         $sort = isset($_GET['scfs_kb_sort']) ? sanitize_key(wp_unslash($_GET['scfs_kb_sort'])) : ($search !== '' ? 'relevance' : 'recent');
         if (!isset($this->discovery_sort_options()[$sort])) $sort = 'relevance';
 
+        $navigation = $this->research_navigation();
+        $area = isset($_GET['scfs_kb_area']) ? sanitize_key(wp_unslash($_GET['scfs_kb_area'])) : '';
+        if (!isset($navigation['areas'][$area])) $area = '';
         $products = $this->products();
         $sections = $this->sections();
         $all_posts = $this->all_published_articles();
@@ -1067,7 +1092,7 @@ final class SCFS_Integrated_Knowledge_Base {
         foreach ($products as $slug => $product) {
             $count = 0;
             foreach (($groups[$slug] ?? array()) as $articles) $count += count($articles);
-            if ($count > 0) { $product['count'] = $count; $available_products[$slug] = $product; }
+            $product['count'] = $count; $available_products[$slug] = $product;
         }
         if ($product_filter !== '' && !isset($available_products[$product_filter])) $product_filter = '';
         $category_groups = $this->browser_category_groups($product_filter);
@@ -1083,17 +1108,29 @@ final class SCFS_Integrated_Knowledge_Base {
         if ($type_filter !== '' && !isset($type_options[$type_filter])) $type_filter = '';
 
         $results = $this->filtered_articles($product_filter, $selected_section, $search, $version_filter, $component_filter, $type_filter, $sort);
+        if ($area !== '') $results = array_values(array_filter($results, function($post) use ($area) { return in_array($area, $this->article_research_areas($post), true); }));
         $total = count($all_posts);
-        $action = remove_query_arg(array('scfs_kb_search', 'scfs_kb_product', 'scfs_kb_version', 'scfs_kb_section', 'scfs_kb_component', 'scfs_kb_type', 'scfs_kb_sort', 'scfs_kb_page'));
-        $base_args = array('scfs_kb_product' => $product_filter, 'scfs_kb_search' => $search, 'scfs_kb_version' => $version_filter, 'scfs_kb_section' => $selected_section, 'scfs_kb_component' => $component_filter, 'scfs_kb_type' => $type_filter, 'scfs_kb_sort' => $sort);
+        $action = remove_query_arg(array('scfs_kb_area', 'scfs_kb_search', 'scfs_kb_product', 'scfs_kb_version', 'scfs_kb_section', 'scfs_kb_component', 'scfs_kb_type', 'scfs_kb_sort', 'scfs_kb_page'));
+        $base_args = array('scfs_kb_area' => $area, 'scfs_kb_product' => $product_filter, 'scfs_kb_search' => $search, 'scfs_kb_version' => $version_filter, 'scfs_kb_section' => $selected_section, 'scfs_kb_component' => $component_filter, 'scfs_kb_type' => $type_filter, 'scfs_kb_sort' => $sort);
 
         ob_start();
         echo '<section class="scfs-kb scfs-kb--library-browser" aria-labelledby="scfs-kb-title" data-scfs-discovery-version="5.4.0">';
         echo '<header class="scfs-kb-library-masthead"><div><p class="scfs-kb-eyebrow">' . esc_html__('Product Support and Feedback Platform', 'sustainable-catalyst-feature-suggestions') . '</p><h2 id="scfs-kb-title">' . esc_html($atts['title']) . '</h2><p>' . esc_html($atts['intro']) . '</p></div><span>' . esc_html(sprintf(__('%1$d support articles across %2$d products', 'sustainable-catalyst-feature-suggestions'), $total, count($available_products))) . '</span></header>';
         $this->render_discovery_breadcrumbs($product_filter, $selected_section, $version_filter, $action, $base_args);
+        if ($area !== '') echo '<p aria-label="Current research area">Research areas / ' . esc_html($navigation['areas'][$area]['label']) . '</p>';
         echo '<div class="scfs-kb-library-layout">';
         echo '<aside class="scfs-kb-library-navigation" aria-label="' . esc_attr__('Knowledge Base navigation', 'sustainable-catalyst-feature-suggestions') . '">';
 
+        echo '<nav aria-label="Research areas" class="scfs-kb-library-nav-group"><h3>Research areas</h3><div class="scfs-kb-library-nav-list">';
+        $args = $base_args; $args['scfs_kb_area'] = '';
+        echo '<a href="' . esc_url($this->browser_url($action, $args)) . '"' . ($area === '' ? ' aria-current="page"' : '') . '>All research areas</a>';
+        foreach ($navigation['areas'] as $slug => $entry) {
+            $count = 0;
+            foreach ($all_posts as $post) if (in_array($slug, $this->article_research_areas($post), true)) $count++;
+            $args = $base_args; $args['scfs_kb_area'] = $slug;
+            echo '<a href="' . esc_url($this->browser_url($action, $args)) . '"' . ($area === $slug ? ' aria-current="page"' : '') . '><span>' . esc_html($entry['label']) . '</span><em>' . esc_html((string) $count) . '</em></a>';
+        }
+        echo '</div></nav><details class="scfs-kb-applications"><summary>All Applications</summary>';
         echo '<section class="scfs-kb-library-nav-group"><h3>' . esc_html__('Products', 'sustainable-catalyst-feature-suggestions') . '</h3><div class="scfs-kb-library-nav-list">';
         $args = $base_args; $args['scfs_kb_product'] = ''; $args['scfs_kb_version'] = ''; $args['scfs_kb_section'] = ''; $args['scfs_kb_component'] = ''; $args['scfs_kb_type'] = '';
         echo '<a class="' . ($product_filter === '' ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html__('All products', 'sustainable-catalyst-feature-suggestions') . '</span><em>' . esc_html((string) $total) . '</em></a>';
@@ -1101,7 +1138,7 @@ final class SCFS_Integrated_Knowledge_Base {
             $args = $base_args; $args['scfs_kb_product'] = $slug; $args['scfs_kb_version'] = ''; $args['scfs_kb_section'] = ''; $args['scfs_kb_component'] = ''; $args['scfs_kb_type'] = '';
             echo '<a class="' . ($slug === $product_filter ? 'is-active' : '') . '" href="' . esc_url($this->browser_url($action, $args)) . '"><span>' . esc_html($product['name']) . '</span><em>' . esc_html((string) $product['count']) . '</em></a>';
         }
-        echo '</div></section>';
+        echo '</div></section></details>';
 
         echo '<section class="scfs-kb-library-nav-group"><h3>' . esc_html__('Versions', 'sustainable-catalyst-feature-suggestions') . '</h3><div class="scfs-kb-library-nav-list scfs-kb-library-nav-list--compact">';
         $args = $base_args; $args['scfs_kb_version'] = '';
@@ -1125,18 +1162,21 @@ final class SCFS_Integrated_Knowledge_Base {
 
         echo '<div class="scfs-kb-library-results" role="region" aria-label="' . esc_attr__('Support Article results', 'sustainable-catalyst-feature-suggestions') . '" aria-live="polite">';
         $active_product = $product_filter !== '' && isset($available_products[$product_filter]) ? $available_products[$product_filter] : null;
-        echo '<header class="scfs-kb-library-results-header"><div><p class="scfs-kb-eyebrow">' . esc_html__('Support Articles', 'sustainable-catalyst-feature-suggestions') . '</p><h3>' . esc_html($active_product ? $active_product['name'] : __('All products', 'sustainable-catalyst-feature-suggestions')) . '</h3>' . ($active_product ? '<p>' . esc_html($active_product['description']) . '</p>' : '') . '</div><span data-scfs-result-count>' . esc_html(sprintf(_n('%d result', '%d results', count($results), 'sustainable-catalyst-feature-suggestions'), count($results))) . '</span></header>';
+        echo '<header class="scfs-kb-library-results-header"><div><p class="scfs-kb-eyebrow">' . esc_html__('Support Articles', 'sustainable-catalyst-feature-suggestions') . '</p><h3>' . esc_html($area !== '' ? $navigation['areas'][$area]['label'] : ($active_product ? $active_product['name'] : __('All products', 'sustainable-catalyst-feature-suggestions'))) . '</h3>' . ($active_product ? '<p>' . esc_html($active_product['description']) . '</p>' : '') . '</div><span data-scfs-result-count>' . esc_html(sprintf(_n('%d result', '%d results', count($results), 'sustainable-catalyst-feature-suggestions'), count($results))) . '</span></header>';
 
         echo '<form class="scfs-kb-library-search" method="get" action="' . esc_url($action) . '" role="search" data-scfs-discovery-form><input type="hidden" name="scfs_kb_product" value="' . esc_attr($product_filter) . '"><input type="hidden" name="scfs_kb_version" value="' . esc_attr($version_filter) . '"><input type="hidden" name="scfs_kb_section" value="' . esc_attr($selected_section) . '"><label class="scfs-kb-library-search-main"><span>' . esc_html__('Search', 'sustainable-catalyst-feature-suggestions') . '</span><input type="search" name="scfs_kb_search" value="' . esc_attr($search) . '" placeholder="' . esc_attr__('Search tasks, features, examples, versions, and error messages', 'sustainable-catalyst-feature-suggestions') . '" autocomplete="off" data-scfs-discovery-search><small>' . esc_html__('Press / anywhere in the browser to focus search. Press Escape to clear.', 'sustainable-catalyst-feature-suggestions') . '</small></label><div class="scfs-kb-library-filter-grid">';
+        echo '<input type="hidden" name="scfs_kb_area" value="' . esc_attr($area) . '">';
         $this->render_browser_select('scfs_kb_component', __('Component', 'sustainable-catalyst-feature-suggestions'), $component_options, $component_filter);
         $this->render_browser_select('scfs_kb_type', __('Article type', 'sustainable-catalyst-feature-suggestions'), $type_options, $type_filter);
         $this->render_browser_select('scfs_kb_sort', __('Sort', 'sustainable-catalyst-feature-suggestions'), array_map(static function($name) { return array('name' => $name, 'count' => 0); }, $this->discovery_sort_options()), $sort, false);
         echo '</div><div class="scfs-kb-library-search-actions"><button type="submit">' . esc_html__('Find Support Articles', 'sustainable-catalyst-feature-suggestions') . '</button><a href="' . esc_url($this->browser_url($action, array('scfs_kb_product' => $product_filter, 'scfs_kb_sort' => 'recent'))) . '">' . esc_html__('Clear', 'sustainable-catalyst-feature-suggestions') . '</a></div></form>';
-        $labels = array('scfs_kb_search' => __('Search', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_product' => __('Product', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_version' => __('Version', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_section' => __('Category', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_component' => __('Component', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_type' => __('Article type', 'sustainable-catalyst-feature-suggestions'));
+        $labels = array('scfs_kb_area' => __('Research area', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_search' => __('Search', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_product' => __('Product', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_version' => __('Version', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_section' => __('Category', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_component' => __('Component', 'sustainable-catalyst-feature-suggestions'), 'scfs_kb_type' => __('Article type', 'sustainable-catalyst-feature-suggestions'));
         $this->render_active_discovery_filters($base_args, $labels, $action);
 
+        if ($area !== '') echo '<p class="scfs-kb-area-context">' . esc_html($navigation['areas'][$area]['label'] . ': ' . $navigation['areas'][$area]['description']) . '</p>';
         echo '<div class="scfs-kb-library-results-list" data-scfs-discovery-results>';
-        if (!$results) $this->render_no_results_recovery($action, $base_args, $all_posts);
+        if (!$results && $area !== '') echo '<p>Documentation in preparation. No published articles match this research area and the selected filters.</p>';
+        elseif (!$results) $this->render_no_results_recovery($action, $base_args, $all_posts);
         else foreach ($results as $post) $this->render_library_article_row($post);
         echo '</div></div></div></section>';
         return ob_get_clean();

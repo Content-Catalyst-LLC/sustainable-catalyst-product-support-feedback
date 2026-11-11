@@ -2131,3 +2131,10 @@ body.single-sc_support_article .entry-content { margin: 0 !important; padding: 0
 .scfs-kb--library-browser.is-navigating:after{content:"Loading support guidance…";display:block;padding:12px;text-align:center;font-weight:800;color:#4d0914}
 @media(max-width:760px){.scfs-kb-active-filters{grid-template-columns:1fr}.scfs-kb-active-filters>span{padding-top:0}.scfs-kb-discovery-breadcrumbs{overflow-x:auto}.scfs-kb-library-filter-grid{grid-template-columns:1fr!important}.scfs-kb-recovery-actions a,.scfs-kb-query-suggestions a{width:100%;justify-content:center}}
 @media print{.scfs-kb-discovery-breadcrumbs,.scfs-kb-active-filters,.scfs-kb-library-search,.scfs-kb-recovery-actions,.scfs-kb-query-suggestions{display:none!important}}
+
+/* SC-KB-01 research navigation: native links/details remain usable without JS. */
+.scfs-kb--library-browser .scfs-kb-library-navigation a[aria-current="page"] {border-left:4px solid #f00;background:#fff;color:#000;font-weight:700}
+.scfs-kb--library-browser :is(a,button,input,select,summary):focus-visible {outline:3px solid #000;outline-offset:3px}
+.scfs-kb-applications summary {cursor:pointer;padding:1rem;font-weight:700;color:#000}
+.scfs-kb-area-context {border-left:4px solid #f00;padding:1rem;background:#fff;color:#000}
+@media(max-width:760px){.scfs-kb--library-browser .scfs-kb-library-layout{display:block}.scfs-kb--library-browser .scfs-kb-library-navigation{position:static;max-height:none}}
