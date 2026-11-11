@@ -1,0 +1,105 @@
+name: Knowledge Base Development Package
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/sc-kb-*']
+permissions:
+  contents: read
+jobs:
+  validate-package:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: synthetic-root-only
+          MYSQL_DATABASE: sc_kb_batch2
+          MYSQL_USER: sc_kb_test
+          MYSQL_PASSWORD: synthetic-test-only
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -psynthetic-root-only"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      SC_KB_WP_ROOT: /tmp/sc-kb-wordpress
+      SC_KB_DB_ENGINE: mysql
+      SC_KB_DB_NAME: sc_kb_batch2
+      SC_KB_DB_USER: sc_kb_test
+      SC_KB_DB_PASSWORD: synthetic-test-only
+      SC_KB_DB_HOST: 127.0.0.1:3306
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli
+          tools: wp-cli
+      - name: PHP syntax and mapping/search contracts
+        run: |
+          find wordpress -name '*.php' -print0 | xargs -0 -n1 php -l
+          php tests/test-sc-kb-navigation.php
+          php tests/test-v525-library-browser.php
+          php tests/test-v529-search-quality.php
+      - name: Validate metadata/checksums and deterministic ZIP
+        run: |
+          python3 tools/knowledge-base/build.py --output dist/package
+          python3 tools/knowledge-base/build.py --output /tmp/sc-kb-repro
+          cmp dist/package/*.zip /tmp/sc-kb-repro/*.zip
+      - name: Fresh synthetic WordPress and historical alpha1 baseline
+        run: |
+          bash tools/knowledge-base/setup-wordpress.sh
+          rm "$SC_KB_WP_ROOT/wp-content/plugins/sustainable-catalyst-feature-suggestions"
+          mkdir -p /tmp/sc-kb-old
+          git archive a5ee82e2d7198a5def782b418e6dd2c8621a71cd -- wordpress/sustainable-catalyst-feature-suggestions | tar -x -C /tmp/sc-kb-old
+          cp -R /tmp/sc-kb-old/wordpress/sustainable-catalyst-feature-suggestions "$SC_KB_WP_ROOT/wp-content/plugins/"
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin plugin activate sustainable-catalyst-feature-suggestions
+          SC_KB_UPGRADE_MODE=capture wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin eval-file tests/integration-kb-upgrade-snapshot.php
+          wp --path="$SC_KB_WP_ROOT" db export /tmp/sc-kb-before-upgrade.sql
+          sha256sum /tmp/sc-kb-before-upgrade.sql > /tmp/sc-kb-before-upgrade.sql.sha256
+          mkdir -p dist/receipts
+      - name: Install new ZIP and assert preserved articles/editorial state
+        run: |
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin plugin install "$PWD/dist/package/sustainable-catalyst-feature-suggestions-7.8.2-alpha.2.zip" --force
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin eval-file tests/integration-kb-upgrade-snapshot.php | tee dist/receipts/upgrade.txt
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin eval-file tests/integration-kb-releases.php | tee dist/receipts/releases.txt
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin eval-file tests/integration-kb-pagination.php | tee dist/receipts/pagination.txt
+      - name: Demonstrate known-good MySQL backup restoration
+        run: |
+          wp --path="$SC_KB_WP_ROOT" option update sc_kb_restore_probe changed
+          sha256sum -c /tmp/sc-kb-before-upgrade.sql.sha256
+          wp --path="$SC_KB_WP_ROOT" db import /tmp/sc-kb-before-upgrade.sql
+          wp --path="$SC_KB_WP_ROOT" eval 'if (get_option("sc_kb_restore_probe", "absent") !== "absent") { throw new Exception("Restoration failed"); } echo "MYSQL_RESTORATION_PASS\n";' | tee dist/receipts/restoration.txt
+          wp --path="$SC_KB_WP_ROOT" --user=sc_kb_test_admin eval-file tests/integration-kb-upgrade-snapshot.php
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sc-kb-development-package-and-receipts
+          path: dist/
+  computational-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install -r tools/knowledge-base/examples/requirements.lock.txt
+      - name: Fetch immutable public application source revisions
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,subprocess
+          root=pathlib.Path('/tmp/sc-kb-apps');root.mkdir()
+          for a in json.load(open('tools/knowledge-base/examples/source-lock.json'))['applications']:
+              p=root/a['application'];subprocess.run(['git','clone','--filter=blob:none','https://github.com/'+a['repository']+'.git',str(p)],check=True)
+              subprocess.run(['git','-C',str(p),'checkout','--detach',a['source_sha']],check=True)
+          PY
+      - name: Run twenty-two source/numerical assertions
+        run: |
+          mkdir -p example-receipts
+          for app in workbench site-intelligence lab decision-studio; do
+            python tools/knowledge-base/examples/run_examples.py --sources /tmp/sc-kb-apps --app "$app" > "example-receipts/$app.json"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-example-receipts
+          path: example-receipts/

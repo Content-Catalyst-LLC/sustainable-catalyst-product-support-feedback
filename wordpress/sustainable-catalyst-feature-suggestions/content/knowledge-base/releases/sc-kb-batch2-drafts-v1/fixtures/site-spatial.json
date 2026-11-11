@@ -1,0 +1,64 @@
+{
+  "area": {
+    "area_id": "city",
+    "mode": "bbox",
+    "bbox": [
+      -88,
+      41,
+      -87,
+      42
+    ],
+    "visibility": "public"
+  },
+  "dataset": {
+    "dataset_id": "observations",
+    "source": "Synthetic KB fixture, not observed measurements",
+    "visibility": "public",
+    "feature_collection": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "id": "inside",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -87.63,
+              41.88
+            ]
+          },
+          "properties": {
+            "score": 10,
+            "api_token": "SYNTHETIC-NOT-A-SECRET"
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "missing",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -87.7,
+              41.9
+            ]
+          },
+          "properties": {}
+        },
+        {
+          "type": "Feature",
+          "id": "outside",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -90,
+              40
+            ]
+          },
+          "properties": {
+            "score": 100
+          }
+        }
+      ]
+    }
+  }
+}

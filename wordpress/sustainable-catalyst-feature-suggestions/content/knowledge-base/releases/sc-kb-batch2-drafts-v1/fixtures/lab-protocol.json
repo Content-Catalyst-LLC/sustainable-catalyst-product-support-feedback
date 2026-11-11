@@ -1,0 +1,51 @@
+{
+  "protocol": {
+    "title": "Synthetic light response protocol",
+    "domain": "demonstration",
+    "designType": "controlled",
+    "objective": "Demonstrate structured records, not a biological conclusion.",
+    "hypothesis": "Light treatment changes the synthetic growth metric within the defined range.",
+    "variables": [
+      {
+        "name": "light",
+        "role": "independent",
+        "unit": "umol m-2 s-1"
+      },
+      {
+        "name": "growth",
+        "role": "dependent",
+        "unit": "mm"
+      }
+    ],
+    "controls": [
+      {
+        "name": "reference light condition"
+      }
+    ],
+    "procedure": [
+      "Assign independent demonstration units",
+      "Record synthetic growth values"
+    ],
+    "analysisPlan": "Inspect run ranges and report limitations.",
+    "sourceIds": [
+      "synthetic-fixture-not-a-citation"
+    ],
+    "createdAt": "2026-11-10T00:00:00Z"
+  },
+  "runs": [
+    {
+      "id": "r1",
+      "replicate": 1,
+      "results": {
+        "growth": 10.0
+      }
+    },
+    {
+      "id": "r2",
+      "replicate": 2,
+      "results": {
+        "growth": 10.2
+      }
+    }
+  ]
+}

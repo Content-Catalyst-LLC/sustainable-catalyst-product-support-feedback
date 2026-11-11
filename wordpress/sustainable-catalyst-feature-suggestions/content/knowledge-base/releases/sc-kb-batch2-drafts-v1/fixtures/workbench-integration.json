@@ -1,0 +1,21 @@
+{
+  "single": {
+    "problemKind": "integration",
+    "problem": {
+      "expression": "x**2",
+      "lower": 0,
+      "upper": 1
+    }
+  },
+  "study": {
+    "problemKind": "integration",
+    "solverKey": "integration.simpson",
+    "problem": {
+      "expression": "sin(x)",
+      "lower": 0,
+      "upper": 3.141592653589793,
+      "samples": 21
+    },
+    "levels": 3
+  }
+}

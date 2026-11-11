@@ -1,0 +1,14 @@
+{
+  "problemKind": "root",
+  "solverKey": "root.brentq",
+  "problem": {
+    "expression": "x**2-2",
+    "variable": "x",
+    "bracket": [
+      0,
+      2
+    ],
+    "tolerance": 1e-10
+  },
+  "requestKey": "kb-sqrt2"
+}
