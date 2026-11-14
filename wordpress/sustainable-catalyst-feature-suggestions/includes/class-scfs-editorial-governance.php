@@ -47,6 +47,8 @@ final class SCFS_Editorial_Governance {
         add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
         add_action('admin_post_scfs_save_editorial_settings', array($this, 'save_settings_action'));
         add_action('admin_post_scfs_editorial_transition', array($this, 'transition_action'));
+        add_filter('bulk_actions-edit-sc_support_article', array($this, 'support_article_bulk_actions'));
+        add_filter('handle_bulk_actions-edit-sc_support_article', array($this, 'handle_support_article_bulk_actions'), 10, 3);
         add_action('admin_post_scfs_run_editorial_governance', array($this, 'run_governance_action'));
         add_action('admin_post_scfs_export_editorial_audit', array($this, 'export_audit_action'));
         add_action(self::CRON_HOOK, array($this, 'run_scheduled_governance'));
@@ -400,7 +402,17 @@ final class SCFS_Editorial_Governance {
 
         echo '<fieldset class="scfs-editorial-transition"><legend>' . esc_html__('Workflow action', 'sustainable-catalyst-feature-suggestions') . '</legend><div class="scfs-editorial-transition-row">';
         echo '<select name="scfs_editorial_transition"><option value="">' . esc_html__('Save without changing state', 'sustainable-catalyst-feature-suggestions') . '</option>';
-        foreach ($this->allowed_transitions()[$state] ?? array() as $target) {
+        $choices = $this->allowed_transitions()[$state] ?? array();
+        if ($post->post_type === 'sc_support_article') {
+            if (in_array($state, array('draft', 'submitted', 'in_review', 'changes_requested'), true) && $this->can_approve()) {
+                $choices[] = 'approved';
+            }
+            if (in_array($state, array('approved', 'in_review', 'changes_requested'), true)) {
+                $choices[] = 'submitted';
+            }
+            $choices = array_values(array_unique($choices));
+        }
+        foreach ($choices as $target) {
             echo '<option value="' . esc_attr($target) . '">' . esc_html($this->workflow_states()[$target]) . '</option>';
         }
         echo '</select>';
@@ -526,7 +538,11 @@ final class SCFS_Editorial_Governance {
         if ($current_state === $target_state) {
             return $this->record($post_id);
         }
-        if (!in_array($target_state, $this->allowed_transitions()[$current_state] ?? array(), true)) {
+        $quick_article_approval = $post->post_type === 'sc_support_article' && $target_state === 'approved'
+            && in_array($current_state, array('draft', 'submitted', 'in_review', 'changes_requested'), true);
+        $quick_article_pending = $post->post_type === 'sc_support_article' && $target_state === 'submitted'
+            && in_array($current_state, array('approved', 'in_review', 'changes_requested'), true);
+        if (!$quick_article_approval && !$quick_article_pending && !in_array($target_state, $this->allowed_transitions()[$current_state] ?? array(), true)) {
             return new WP_Error('scfs_editorial_transition_invalid', sprintf(__('The transition from %1$s to %2$s is not allowed.', 'sustainable-catalyst-feature-suggestions'), $current_state, $target_state));
         }
         if (!$system && !$this->can_manage()) {
@@ -585,6 +601,12 @@ final class SCFS_Editorial_Governance {
 
     public function transition_gate($post_id, $target_state) {
         $settings = $this->settings();
+        $post = get_post($post_id);
+        // Editorial approval of support guidance is distinct from publishing or scientific certification.
+        // An authorized approver may approve a saved article revision without publication-only gates.
+        if ($post && $post->post_type === 'sc_support_article' && $target_state === 'approved') {
+            return true;
+        }
         $reviewer_id = absint(get_post_meta($post_id, '_scfs_editorial_reviewer_id', true));
         $approver_id = absint(get_post_meta($post_id, '_scfs_editorial_approver_id', true));
         $author_id = absint(get_post_meta($post_id, '_scfs_editorial_author_id', true));
@@ -1285,6 +1307,55 @@ final class SCFS_Editorial_Governance {
         $this->append_audit(0, 'governance_settings_updated', array('minimum_standards_score' => $settings['minimum_standards_score']));
         wp_safe_redirect(admin_url('edit.php?post_type=' . Sustainable_Catalyst_Feature_Suggestions::POST_TYPE . '&page=' . self::ADMIN_SLUG . '&updated=1'));
         exit;
+    }
+
+    /**
+     * Explicit editorial actions for selected Support Articles only.
+     * These operations do not publish an article or attest to scientific verification.
+     */
+    public function support_article_bulk_actions($actions) {
+        if ($this->can_manage() && $this->can_approve()) {
+            $actions['scfs_editorial_bulk_approve'] = __('Approve selected articles (editorial)', 'sustainable-catalyst-feature-suggestions');
+        }
+        if ($this->can_manage()) {
+            $actions['scfs_editorial_bulk_pending'] = __('Mark selected articles pending review', 'sustainable-catalyst-feature-suggestions');
+        }
+        return $actions;
+    }
+
+    public function handle_support_article_bulk_actions($redirect_to, $action, $post_ids) {
+        if (!in_array($action, array('scfs_editorial_bulk_approve', 'scfs_editorial_bulk_pending'), true)) {
+            return $redirect_to;
+        }
+        if (!$this->can_manage() || ($action === 'scfs_editorial_bulk_approve' && !$this->can_approve())) {
+            return add_query_arg('scfs_editorial_bulk_denied', '1', $redirect_to);
+        }
+        // WordPress checks the bulk-action nonce before calling this filter.
+        $target = $action === 'scfs_editorial_bulk_approve' ? 'approved' : 'submitted';
+        $passed = 0;
+        $failed = array();
+        foreach (array_unique(array_map('absint', (array) $post_ids)) as $post_id) {
+            $post = get_post($post_id);
+            if (!$post || $post->post_type !== 'sc_support_article' || !current_user_can('edit_post', $post_id)) {
+                $failed[] = $post_id;
+                continue;
+            }
+            // Do not demote publicly published or scheduled records through a bulk edit.
+            if (in_array($post->post_status, array('publish', 'future', 'private'), true)) {
+                $failed[] = $post_id;
+                continue;
+            }
+            $result = $this->transition_record($post_id, $target, 'Owner-selected support article editorial action', get_current_user_id(), false);
+            if (is_wp_error($result)) {
+                $failed[] = $post_id;
+            } else {
+                $passed++;
+            }
+        }
+        return add_query_arg(array(
+            'scfs_editorial_bulk_updated' => $passed,
+            'scfs_editorial_bulk_failed' => count($failed),
+        ), $redirect_to);
     }
 
     public function transition_action() {
