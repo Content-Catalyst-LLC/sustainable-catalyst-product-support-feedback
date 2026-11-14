@@ -49,6 +49,8 @@ final class SCFS_Editorial_Governance {
         add_action('admin_post_scfs_editorial_transition', array($this, 'transition_action'));
         add_filter('bulk_actions-edit-sc_support_article', array($this, 'support_article_bulk_actions'));
         add_filter('handle_bulk_actions-edit-sc_support_article', array($this, 'handle_support_article_bulk_actions'), 10, 3);
+        add_filter('views_edit-sc_support_article', array($this, 'support_article_editorial_views'));
+        add_action('pre_get_posts', array($this, 'filter_support_article_editorial_list'));
         add_action('admin_post_scfs_run_editorial_governance', array($this, 'run_governance_action'));
         add_action('admin_post_scfs_export_editorial_audit', array($this, 'export_audit_action'));
         add_action(self::CRON_HOOK, array($this, 'run_scheduled_governance'));
@@ -1307,6 +1309,56 @@ final class SCFS_Editorial_Governance {
         $this->append_audit(0, 'governance_settings_updated', array('minimum_standards_score' => $settings['minimum_standards_score']));
         wp_safe_redirect(admin_url('edit.php?post_type=' . Sustainable_Catalyst_Feature_Suggestions::POST_TYPE . '&page=' . self::ADMIN_SLUG . '&updated=1'));
         exit;
+    }
+
+    /**
+     * Clearly distinguish the WordPress post status from editorial approval.
+     * Approved articles remain unpublished, but are not shown as awaiting review.
+     */
+    public function support_article_editorial_views($views) {
+        if (!$this->can_manage()) {
+            return $views;
+        }
+        $base = admin_url('edit.php?post_type=sc_support_article');
+        $selected = isset($_GET['scfs_editorial_view']) ? sanitize_key(wp_unslash($_GET['scfs_editorial_view'])) : '';
+        $approved = new WP_Query(array(
+            'post_type' => 'sc_support_article',
+            'post_status' => 'pending',
+            'meta_key' => '_scfs_editorial_state',
+            'meta_value' => 'approved',
+            'posts_per_page' => 1,
+            'fields' => 'ids',
+            'no_found_rows' => false,
+        ));
+        $count = (int) $approved->found_posts;
+        $views['scfs_editorial_approved'] = '<a href="' . esc_url(add_query_arg('scfs_editorial_view', 'approved', $base)) . '"' .
+            ($selected === 'approved' ? ' class="current" aria-current="page"' : '') . '>' .
+            esc_html__('Editorial Approved', 'sustainable-catalyst-feature-suggestions') .
+            ' <span class="count">(' . number_format_i18n($count) . ')</span></a>';
+        return $views;
+    }
+
+    public function filter_support_article_editorial_list($query) {
+        if (!is_admin() || !$query->is_main_query() || !$this->can_manage() ||
+            $query->get('post_type') !== 'sc_support_article') {
+            return;
+        }
+        $view = isset($_GET['scfs_editorial_view']) ? sanitize_key(wp_unslash($_GET['scfs_editorial_view'])) : '';
+        $post_status = $query->get('post_status');
+        if ($view === 'approved') {
+            $query->set('post_status', 'pending');
+            $query->set('meta_query', array(array(
+                'key' => '_scfs_editorial_state',
+                'value' => 'approved',
+                'compare' => '=',
+            )));
+        } elseif ($post_status === 'pending' && $view === '') {
+            // Existing Pending tab means awaiting editorial review; hide approved items.
+            $query->set('meta_query', array('relation' => 'OR',
+                array('key' => '_scfs_editorial_state', 'compare' => 'NOT EXISTS'),
+                array('key' => '_scfs_editorial_state', 'value' => 'approved', 'compare' => '!='),
+            ));
+        }
     }
 
     /**
