@@ -47,10 +47,8 @@ final class SCFS_Editorial_Governance {
         add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
         add_action('admin_post_scfs_save_editorial_settings', array($this, 'save_settings_action'));
         add_action('admin_post_scfs_editorial_transition', array($this, 'transition_action'));
-        add_filter('bulk_actions-edit-sc_support_article', array($this, 'support_article_bulk_actions'));
-        add_filter('handle_bulk_actions-edit-sc_support_article', array($this, 'handle_support_article_bulk_actions'), 10, 3);
-        add_filter('views_edit-sc_support_article', array($this, 'support_article_editorial_views'));
-        add_action('pre_get_posts', array($this, 'filter_support_article_editorial_list'));
+        // Support Articles use the native WordPress Save Draft / Publish / Update workflow.
+        add_action('transition_post_status', array($this, 'sync_support_article_native_state'), 10, 3);
         add_action('admin_post_scfs_run_editorial_governance', array($this, 'run_governance_action'));
         add_action('admin_post_scfs_export_editorial_audit', array($this, 'export_audit_action'));
         add_action(self::CRON_HOOK, array($this, 'run_scheduled_governance'));
@@ -58,6 +56,9 @@ final class SCFS_Editorial_Governance {
         add_filter('wp_insert_post_data', array($this, 'enforce_publication_gate'), 30, 2);
 
         foreach ($this->managed_post_types() as $post_type) {
+            if ($post_type === 'sc_support_article') {
+                continue;
+            }
             add_filter('manage_' . $post_type . '_posts_columns', array($this, 'admin_columns'));
             add_action('manage_' . $post_type . '_posts_custom_column', array($this, 'admin_column_content'), 10, 2);
         }
@@ -328,6 +329,9 @@ final class SCFS_Editorial_Governance {
 
     public function add_meta_boxes() {
         foreach ($this->managed_post_types() as $post_type) {
+            if ($post_type === 'sc_support_article') {
+                continue;
+            }
             add_meta_box(
                 'scfs-editorial-governance',
                 __('Editorial Workflow and Governance', 'sustainable-catalyst-feature-suggestions'),
@@ -447,6 +451,9 @@ final class SCFS_Editorial_Governance {
     }
 
     public function save_editorial_meta($post_id, $post, $update) {
+        if ($post && $post->post_type === 'sc_support_article') {
+            return;
+        }
         if (!$post || !in_array($post->post_type, $this->managed_post_types(), true)) {
             return;
         }
@@ -681,6 +688,9 @@ final class SCFS_Editorial_Governance {
     }
 
     public function enforce_publication_gate($data, $postarr) {
+        if (($data['post_type'] ?? '') === 'sc_support_article') {
+            return $data;
+        }
         if (apply_filters('scfs_editorial_allow_system_publication', false, $data, $postarr)) {
             return $data;
         }
@@ -1047,6 +1057,9 @@ final class SCFS_Editorial_Governance {
         $today = gmdate('Y-m-d');
         $now = time();
         foreach ($records as $record) {
+            if (($record['post_type'] ?? '') === 'sc_support_article') {
+                continue;
+            }
             $result['checked']++;
             if ($record['state'] === 'scheduled' && $record['scheduled_at'] && strtotime($record['scheduled_at'] . ' UTC') <= $now) {
                 $transition = $this->transition_record($record['id'], 'published', __('Scheduled publication executed automatically.', 'sustainable-catalyst-feature-suggestions'), 0, true);
@@ -1365,6 +1378,26 @@ final class SCFS_Editorial_Governance {
      * Explicit editorial actions for selected Support Articles only.
      * These operations do not publish an article or attest to scientific verification.
      */
+    /**
+     * Keep legacy editorial metadata consistent with native WordPress status.
+     * This hook observes status changes; it never changes the post status.
+     */
+    public function sync_support_article_native_state($new_status, $old_status, $post) {
+        if (!$post || $post->post_type !== 'sc_support_article' || $new_status === $old_status) {
+            return;
+        }
+        $map = array(
+            'draft' => 'draft',
+            'pending' => 'submitted',
+            'publish' => 'published',
+            'future' => 'scheduled',
+            'private' => 'archived',
+        );
+        if (isset($map[$new_status])) {
+            update_post_meta($post->ID, '_scfs_editorial_state', $map[$new_status]);
+        }
+    }
+
     public function support_article_bulk_actions($actions) {
         if ($this->can_manage() && $this->can_approve()) {
             $actions['scfs_editorial_bulk_approve'] = __('Approve selected articles (editorial)', 'sustainable-catalyst-feature-suggestions');
