@@ -601,7 +601,7 @@ final class SCFS_Editorial_Governance {
 
     public function transition_gate($post_id, $target_state) {
         $settings = $this->settings();
-        $post = get_post($post_id);
+        $post = function_exists('get_post') ? get_post($post_id) : null;
         // Editorial approval of support guidance is distinct from publishing or scientific certification.
         // An authorized approver may approve a saved article revision without publication-only gates.
         if ($post && $post->post_type === 'sc_support_article' && $target_state === 'approved') {
